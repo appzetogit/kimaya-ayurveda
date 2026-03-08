@@ -188,7 +188,7 @@ const AppRoutes = () => {
         path="/"
         element={
           <RouteWrapper>
-            <ComingSoon />
+            <MobileHome />
           </RouteWrapper>
         }
       />
@@ -528,8 +528,14 @@ const AppRoutes = () => {
       {/* Delivery Routes */}
       <Route path="/delivery/login" element={<DeliveryLogin />} />
       <Route path="/delivery/register" element={<DeliveryRegister />} />
-      <Route path="/delivery/forgot-password" element={<DeliveryForgotPassword />} />
-      <Route path="/delivery/reset-password" element={<DeliveryResetPassword />} />
+      <Route
+        path="/delivery/forgot-password"
+        element={<DeliveryForgotPassword />}
+      />
+      <Route
+        path="/delivery/reset-password"
+        element={<DeliveryResetPassword />}
+      />
       <Route
         path="/delivery"
         element={
@@ -548,7 +554,10 @@ const AppRoutes = () => {
       <Route path="/vendor/login" element={<VendorLogin />} />
       <Route path="/vendor/register" element={<VendorRegister />} />
       <Route path="/vendor/verification" element={<VendorVerification />} />
-      <Route path="/vendor/forgot-password" element={<VendorForgotPassword />} />
+      <Route
+        path="/vendor/forgot-password"
+        element={<VendorForgotPassword />}
+      />
       <Route path="/vendor/reset-password" element={<VendorResetPassword />} />
       <Route
         path="/vendor"
@@ -616,8 +625,7 @@ const AppRoutes = () => {
         <Route path="profile" element={<VendorSettings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
-
-    </Routes >
+    </Routes>
   );
 };
 
