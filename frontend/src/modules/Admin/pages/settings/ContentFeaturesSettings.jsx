@@ -231,6 +231,18 @@ const ContentFeaturesSettings = () => {
           {/* Homepage Section */}
           {activeSection === 'homepage' && (
             <div className="space-y-6">
+              <div className="flex flex-col gap-2 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <label className="text-sm font-semibold text-gray-800">Homepage Tagline</label>
+                <input
+                  type="text"
+                  value={homepageData.tagline || ''}
+                  onChange={(e) => setHomepageData({ ...homepageData, tagline: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="e.g. Shop from 50+ Trusted Vendors"
+                />
+                <p className="text-xs text-gray-600">This text appears below the hero banner.</p>
+              </div>
+
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Hero Banner</h4>

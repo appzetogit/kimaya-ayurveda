@@ -1,12 +1,9 @@
 import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
 import VendorShowcaseCard from './VendorShowcaseCard';
-import { getApprovedVendors } from '../../data/catalogData';
 
-const FeaturedVendorsSection = ({ vendors = null }) => {
-  const approvedVendors = Array.isArray(vendors) && vendors.length > 0
-    ? vendors
-    : getApprovedVendors();
+const FeaturedVendorsSection = ({ vendors = [] }) => {
+  const approvedVendors = Array.isArray(vendors) ? vendors : [];
   const featuredVendors = approvedVendors
     .filter(v => v.isVerified)
     .sort((a, b) => (b.rating || 0) - (a.rating || 0))

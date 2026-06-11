@@ -96,11 +96,6 @@ const ManageProducts = () => {
 
   const columns = [
     {
-      key: "id",
-      label: "ID",
-      sortable: true,
-    },
-    {
       key: "name",
       label: "Product Name",
       sortable: true,

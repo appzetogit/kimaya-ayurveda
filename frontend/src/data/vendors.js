@@ -1,4 +1,5 @@
-import logoImage from "../../data/logos/ChatGPT Image Dec 2, 2025, 03_01_19 PM.png";
+import { appLogo } from "./logos";
+const logoImage = appLogo.src;
 
 export const vendors = [
   {

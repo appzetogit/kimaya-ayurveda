@@ -1,13 +1,9 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { getCatalogBrands } from '../../data/catalogData';
 
-const BrandLogosScroll = ({ brands = null }) => {
+const BrandLogosScroll = ({ brands = [] }) => {
     const navigate = useNavigate();
-    const fallbackBrands = getCatalogBrands().slice(0, 10);
-    const displayBrands = Array.isArray(brands) && brands.length > 0
-        ? brands.slice(0, 10)
-        : fallbackBrands;
+    const displayBrands = Array.isArray(brands) ? brands.slice(0, 10) : [];
 
     return (
         <section className="bg-transparent w-full overflow-hidden">

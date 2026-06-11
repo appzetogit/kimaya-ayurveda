@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link, matchPath, useNavigate } from "react-router-dom";
 import { FiHeart } from "react-icons/fi";
 import MobileLayout from "../components/Layout/MobileLayout";
@@ -12,20 +12,11 @@ import FeaturedVendorsSection from "../components/Mobile/FeaturedVendorsSection"
 import BrandLogosScroll from "../components/Mobile/BrandLogosScroll";
 import MobileCategoryGrid from "../components/Mobile/MobileCategoryGrid";
 import LazyImage from "../../../shared/components/LazyImage";
-import {
-  getMostPopular,
-  getTrending,
-  getFlashSale,
-  getDailyDeals,
-  getAllNewArrivals,
-  getRecommendedProducts,
-  getApprovedVendors,
-  getCatalogBrands,
-} from "../data/catalogData";
 import PageTransition from "../../../shared/components/PageTransition";
 import usePullToRefresh from "../hooks/usePullToRefresh";
 import toast from "react-hot-toast";
 import api from "../../../shared/utils/api";
+import { useSettingsStore } from "../../../shared/store/settingsStore";
 import heroSlide1 from "../../../../data/hero/slide1.png";
 import heroSlide2 from "../../../../data/hero/slide2.png";
 import heroSlide3 from "../../../../data/hero/slide3.png";
@@ -184,6 +175,7 @@ const isSafeInternalPath = (target) => String(target || "").startsWith("/");
 
 const MobileHome = () => {
   const navigate = useNavigate();
+  const { settings, initialize: initSettings } = useSettingsStore();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -197,34 +189,24 @@ const MobileHome = () => {
   const [homeVendors, setHomeVendors] = useState([]);
   const [homeBrands, setHomeBrands] = useState([]);
 
-  const fallbackMostPopular = getMostPopular();
-  const fallbackTrending = getTrending();
-  const fallbackFlashSale = getFlashSale();
-  const fallbackNewArrivals = getAllNewArrivals().slice(0, 6);
-  const fallbackDailyDeals = getDailyDeals().slice(0, 5);
-  const fallbackRecommended = getRecommendedProducts(6);
-  const fallbackVendors = getApprovedVendors();
-  const fallbackBrands = getCatalogBrands().slice(0, 10);
+  // Dynamic tagline from settings DB
+  const tagline = settings?.homepage?.tagline || "Shop from 50+ Trusted Vendors";
 
   const computedNewArrivals = useMemo(() => {
-    if (catalogProducts.length === 0) return fallbackNewArrivals;
     return catalogProducts.filter((p) => p.isNew).slice(0, 6);
-  }, [catalogProducts, fallbackNewArrivals]);
+  }, [catalogProducts]);
 
   const computedDailyDeals = useMemo(() => {
-    if (catalogProducts.length === 0) return fallbackDailyDeals;
     return deriveDailyDeals(catalogProducts).slice(0, 5);
-  }, [catalogProducts, fallbackDailyDeals]);
+  }, [catalogProducts]);
 
   const computedRecommended = useMemo(() => {
-    if (catalogProducts.length === 0) return fallbackRecommended;
     return [...catalogProducts]
       .sort((a, b) => toNumber(b.rating, 0) - toNumber(a.rating, 0))
       .slice(0, 6);
-  }, [catalogProducts, fallbackRecommended]);
+  }, [catalogProducts]);
 
   const computedMostPopular = useMemo(() => {
-    if (catalogProducts.length === 0) return fallbackMostPopular.slice(0, 6);
     return [...catalogProducts]
       .sort((a, b) => {
         const reviewsDiff = toNumber(b.reviewCount, 0) - toNumber(a.reviewCount, 0);
@@ -232,10 +214,9 @@ const MobileHome = () => {
         return toNumber(b.rating, 0) - toNumber(a.rating, 0);
       })
       .slice(0, 6);
-  }, [catalogProducts, fallbackMostPopular]);
+  }, [catalogProducts]);
 
   const computedTrending = useMemo(() => {
-    if (catalogProducts.length === 0) return fallbackTrending.slice(0, 6);
     return [...catalogProducts]
       .sort((a, b) => {
         const ratingDiff = toNumber(b.rating, 0) - toNumber(a.rating, 0);
@@ -243,25 +224,22 @@ const MobileHome = () => {
         return toNumber(b.reviewCount, 0) - toNumber(a.reviewCount, 0);
       })
       .slice(0, 6);
-  }, [catalogProducts, fallbackTrending]);
+  }, [catalogProducts]);
 
   const computedFlashSale = useMemo(() => {
-    if (catalogProducts.length === 0) return fallbackFlashSale.slice(0, 6);
     return catalogProducts.filter((product) => product.flashSale).slice(0, 6);
-  }, [catalogProducts, fallbackFlashSale]);
+  }, [catalogProducts]);
 
   const computedVendors = useMemo(() => {
-    if (homeVendors.length === 0) return fallbackVendors;
     return [...homeVendors]
       .filter((vendor) => vendor.status === "approved")
       .sort((a, b) => toNumber(b.rating, 0) - toNumber(a.rating, 0))
       .slice(0, 10);
-  }, [homeVendors, fallbackVendors]);
+  }, [homeVendors]);
 
   const computedBrands = useMemo(() => {
-    if (homeBrands.length === 0) return fallbackBrands;
     return homeBrands.slice(0, 10);
-  }, [homeBrands, fallbackBrands]);
+  }, [homeBrands]);
 
   const fetchHomeData = useCallback(async () => {
     try {
@@ -361,8 +339,9 @@ const MobileHome = () => {
   }, []);
 
   useEffect(() => {
+    initSettings();
     fetchHomeData();
-  }, [fetchHomeData]);
+  }, [fetchHomeData, initSettings]);
 
   // Auto-slide functionality (pauses when user is dragging)
   useEffect(() => {
@@ -716,7 +695,7 @@ const MobileHome = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}>
-              <span>Shop from 50+ Trusted Vendors</span>
+              <span>{tagline}</span>
               <motion.span
                 animate={{
                   scale: [1, 1.2, 1],

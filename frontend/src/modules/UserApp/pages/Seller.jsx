@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import MobileLayout from "../components/Layout/MobileLayout";
 import ProductCard from "../../../shared/components/ProductCard";
 import ProductListItem from "../components/Mobile/ProductListItem";
-import { getProductsByVendor, getVendorById } from "../data/catalogData";
 import PageTransition from "../../../shared/components/PageTransition";
 import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import LazyImage from "../../../shared/components/LazyImage";
@@ -45,8 +44,8 @@ const Seller = () => {
 
     // Get vendor information
     const vendor = useMemo(
-        () => getVendorById(vendorId) || remoteVendor,
-        [vendorId, catalogVersion, remoteVendor]
+        () => remoteVendor,
+        [remoteVendor]
     );
 
     const [showFilters, setShowFilters] = useState(false);
@@ -60,20 +59,8 @@ const Seller = () => {
     // Get products for this vendor
     const rawVendorProducts = useMemo(() => {
         if (!vendorId) return [];
-
-        const local = getProductsByVendor(vendorId);
-        if (!remoteProducts.length) return local;
-
-        const merged = [...remoteProducts];
-        local.forEach((item) => {
-            const exists = merged.some(
-                (p) => String(p.id) === String(item.id)
-            );
-            if (!exists) merged.push(item);
-        });
-
-        return merged;
-    }, [vendorId, remoteProducts, catalogVersion]);
+        return remoteProducts;
+    }, [vendorId, remoteProducts]);
 
     const vendorProducts = useMemo(() => {
         let result = rawVendorProducts;

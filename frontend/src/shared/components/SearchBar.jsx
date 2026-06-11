@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiSearch, FiClock, FiTrendingUp } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCatalogProducts } from '../../modules/UserApp/data/catalogData';
 import api from '../utils/api';
 
 const RECENT_SEARCHES_KEY = 'recent-searches';
@@ -79,18 +78,7 @@ const SearchBar = () => {
         );
       } catch {
         if (cancelled) return;
-        const lowerQuery = searchQuery.toLowerCase();
-        const fallback = getCatalogProducts()
-          .filter((product) => String(product?.name || '').toLowerCase().includes(lowerQuery))
-          .slice(0, MAX_SUGGESTIONS)
-          .map((product) => ({
-            type: 'product',
-            id: product.id,
-            name: product.name,
-            image: product.image,
-            price: Number(product.price) || 0,
-          }));
-        setSuggestions(fallback);
+        setSuggestions([]);
       }
       setSelectedIndex(-1);
     };

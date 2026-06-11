@@ -99,17 +99,17 @@ const AnimatedBanner = ({ banners = null }) => {
   const resolvedBanners =
     Array.isArray(banners) && banners.length > 0
       ? banners.map((banner, index) => ({
-          id: banner.id || `banner-${index}`,
-          title: banner.title || "Special Offer",
-          subtitle: banner.subtitle || "Limited Time",
-          discount: banner.discount || "Shop Now",
-          description: banner.description || "",
-          gradient:
-            banner.gradient || gradientPalette[index % gradientPalette.length],
-          link: resolveBannerLink(banner),
-          icon: banner.icon || FiTag,
-          heroImage: banner.image || banner.heroImage || watchImg,
-        }))
+        id: banner.id || `banner-${index}`,
+        title: banner.title || "Special Offer",
+        subtitle: banner.subtitle || "Limited Time",
+        discount: banner.discount || "Shop Now",
+        description: banner.description || "",
+        gradient:
+          banner.gradient || gradientPalette[index % gradientPalette.length],
+        link: resolveBannerLink(banner),
+        icon: banner.icon || FiTag,
+        heroImage: banner.image || banner.heroImage || watchImg,
+      }))
       : defaultBanners;
 
   const handleBannerClick = (target) => {

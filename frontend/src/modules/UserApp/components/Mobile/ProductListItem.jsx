@@ -6,8 +6,6 @@ import { useWishlistStore } from "../../../../shared/store/wishlistStore";
 import { formatPrice } from "../../../../shared/utils/helpers";
 import toast from "react-hot-toast";
 import LazyImage from '../../../../shared/components/LazyImage';
-import VendorBadge from "../../../Vendor/components/VendorBadge";
-import { getVendorById } from "../../data/catalogData";
 import { getVariantSignature } from "../../../../shared/utils/variant";
 
 const ProductListItem = ({ product, index, isFlashSale = false }) => {

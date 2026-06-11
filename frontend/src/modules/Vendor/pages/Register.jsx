@@ -31,6 +31,14 @@ const VendorRegister = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    if (name === 'phone') {
+      const numericValue = value.replace(/\D/g, '');
+      if (numericValue.length <= 10) {
+        setFormData({ ...formData, [name]: numericValue });
+      }
+      return;
+    }
+
     if (name.startsWith('address.')) {
       const addressField = name.split('.')[1];
       setFormData({
@@ -54,6 +62,11 @@ const VendorRegister = () => {
     // Validation
     if (!formData.name || !formData.email || !formData.phone || !formData.password || !formData.storeName) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (formData.phone.length !== 10) {
+      toast.error('Phone number must be exactly 10 digits');
       return;
     }
 
@@ -155,7 +168,8 @@ const VendorRegister = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+1234567890"
+                    placeholder="9876543210"
+                    maxLength="10"
                     className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 text-gray-800 placeholder:text-gray-400"
                     required
                   />

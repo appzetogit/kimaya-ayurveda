@@ -9,7 +9,7 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated, isLoading } = useAdminAuthStore();
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -34,7 +34,7 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.email || !formData.password) {
       toast.error('Please fill in all fields');
       return;

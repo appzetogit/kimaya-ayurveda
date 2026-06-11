@@ -427,6 +427,15 @@ router.post('/shipping/estimate', asyncHandler(async (req, res) => {
     );
 }));
 
+// GET /api/settings
+router.get('/settings', asyncHandler(async (req, res) => {
+    const { default: Settings } = await import('../models/Settings.model.js');
+    const settings = await Settings.find({}).lean();
+    const settingsObj = {};
+    settings.forEach(s => { settingsObj[s.key] = s.value; });
+    res.status(200).json(new ApiResponse(200, settingsObj, 'Settings fetched.'));
+}));
+
 // GET /api/banners
 router.get('/banners', asyncHandler(async (req, res) => {
     const { type } = req.query;

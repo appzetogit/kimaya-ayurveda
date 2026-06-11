@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import MobileLayout from "../components/Layout/MobileLayout";
 import ProductCard from "../../../shared/components/ProductCard";
 import ProductListItem from "../components/Mobile/ProductListItem";
-import { categories as fallbackCategories } from "../../../data/categories";
 import PageTransition from "../../../shared/components/PageTransition";
 import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import api from "../../../shared/utils/api";
@@ -66,11 +65,7 @@ const MobileOffers = () => {
   }, [initializeCategories]);
 
   const categories = useMemo(() => {
-    const activeStoreCategories = storeCategories.filter((cat) => cat.isActive !== false);
-    if (activeStoreCategories.length) {
-      return activeStoreCategories;
-    }
-    return fallbackCategories;
+    return storeCategories.filter((cat) => cat.isActive !== false);
   }, [storeCategories]);
 
   useEffect(() => {

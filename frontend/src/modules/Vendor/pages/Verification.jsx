@@ -115,7 +115,7 @@ const VendorVerification = () => {
         {/* Verification Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Code Inputs */}
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-2 sm:gap-3">
             {codes.map((code, index) => (
               <input
                 key={index}
@@ -127,7 +127,7 @@ const VendorVerification = () => {
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={index === 0 ? handlePaste : undefined}
-                className="w-16 h-16 text-center text-2xl font-bold bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 text-gray-800"
+                className="w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-14 text-center text-xl sm:text-2xl font-bold bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 text-gray-800"
               />
             ))}
           </div>

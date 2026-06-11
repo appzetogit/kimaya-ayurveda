@@ -6,7 +6,6 @@ import MobileLayout from "../components/Layout/MobileLayout";
 import ProductCard from '../../../shared/components/ProductCard';
 import ProductListItem from '../components/Mobile/ProductListItem';
 import SearchSuggestions from '../components/Mobile/SearchSuggestions';
-import { categories as fallbackCategories } from '../../../data/categories';
 import PageTransition from '../../../shared/components/PageTransition';
 import { useCategoryStore } from '../../../shared/store/categoryStore';
 import toast from 'react-hot-toast';
@@ -188,11 +187,7 @@ const MobileSearch = () => {
   };
 
   const categories = useMemo(() => {
-    const activeStoreCategories = storeCategories.filter((cat) => cat.isActive !== false);
-    if (activeStoreCategories.length) {
-      return activeStoreCategories;
-    }
-    return fallbackCategories;
+    return storeCategories.filter((cat) => cat.isActive !== false);
   }, [storeCategories]);
 
   const buildQueryParams = useCallback(

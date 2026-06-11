@@ -8,7 +8,7 @@ export const getSalesReport = asyncHandler(async (req, res) => {
     const {
         page = 1,
         limit = 20,
-        status = 'delivered',
+        status = 'all',
         startDate,
         endDate,
         search
@@ -19,7 +19,11 @@ export const getSalesReport = asyncHandler(async (req, res) => {
     const skip = (numericPage - 1) * numericLimit;
 
     const filter = { isDeleted: { $ne: true } };
-    if (status && status !== 'all') filter.status = status;
+    if (status && status !== 'all') {
+        filter.status = status;
+    } else {
+        filter.status = { $ne: 'cancelled' };
+    }
     if (startDate || endDate) {
         filter.createdAt = {};
         if (startDate) filter.createdAt.$gte = new Date(startDate);

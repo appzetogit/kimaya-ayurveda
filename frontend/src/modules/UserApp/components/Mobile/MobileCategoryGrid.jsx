@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { categories as fallbackCategories } from "../../../../data/categories";
 import LazyImage from "../../../../shared/components/LazyImage";
 import { useCategoryStore } from "../../../../shared/store/categoryStore";
 
@@ -16,20 +15,10 @@ const MobileCategoryGrid = () => {
 
   const displayCategories = useMemo(() => {
     const roots = getRootCategories().filter((cat) => cat.isActive !== false);
-    if (!roots.length) return fallbackCategories;
-
-    return roots.map((cat) => {
-      const fallbackCat = fallbackCategories.find(
-        (fc) =>
-          normalizeId(fc.id) === normalizeId(cat.id) ||
-          fc.name?.toLowerCase() === cat.name?.toLowerCase()
-      );
-      return {
-        ...(fallbackCat || {}),
-        ...cat,
-        image: cat.image || fallbackCat?.image || "",
-      };
-    });
+    return roots.map((cat) => ({
+      ...cat,
+      image: cat.image || "",
+    }));
   }, [categories, getRootCategories]);
 
   return (

@@ -3,14 +3,13 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FiThumbsUp, FiArrowRight } from "react-icons/fi";
 import ProductCard from "../../../../shared/components/ProductCard";
-import { getRecommendedProducts } from "../../data/catalogData";
 
-const RecommendedSection = ({ products = null }) => {
+const RecommendedSection = ({ products = [] }) => {
   const recommended = useMemo(() => {
     if (Array.isArray(products) && products.length > 0) {
       return products.slice(0, 6);
     }
-    return getRecommendedProducts(6);
+    return [];
   }, [products]);
 
   if (recommended.length === 0) {

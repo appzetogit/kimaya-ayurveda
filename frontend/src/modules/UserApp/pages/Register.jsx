@@ -193,10 +193,16 @@ const MobileRegister = () => {
                       <FiPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
                         type="tel"
+                        maxLength={10}
                         {...register('phone', {
                           required: 'Phone number is required',
-                          validate: (value) =>
-                            isValidPhone(value) || 'Please enter a valid phone number',
+                          pattern: {
+                            value: /^[0-9]{10}$/,
+                            message: 'Phone number must be exactly 10 digits'
+                          },
+                          onChange: (e) => {
+                            e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                          }
                         })}
                         className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${errors.phone
                             ? 'border-red-300 focus:border-red-500'

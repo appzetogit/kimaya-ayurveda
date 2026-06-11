@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX, FiClock } from 'react-icons/fi';
-import { getCatalogProducts } from '../../data/catalogData';
 import api from '../../../../shared/utils/api';
 
 const SearchSuggestions = ({
@@ -58,12 +57,7 @@ const SearchSuggestions = ({
         );
       } catch {
         if (cancelled) return;
-        const fallback = getCatalogProducts()
-          .filter((product) =>
-            String(product?.name || '').toLowerCase().includes(trimmedQuery.toLowerCase())
-          )
-          .slice(0, 5);
-        setSuggestions(fallback);
+        setSuggestions([]);
       }
     };
 

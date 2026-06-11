@@ -5,8 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import MobileLayout from "../components/Layout/MobileLayout";
 import ProductCard from "../../../shared/components/ProductCard";
 import ProductListItem from "../components/Mobile/ProductListItem";
-import { getCatalogProducts } from "../data/catalogData";
-import { categories as fallbackCategories } from "../../../data/categories";
 import { useCategoryStore } from "../../../shared/store/categoryStore";
 import PageTransition from "../../../shared/components/PageTransition";
 import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
@@ -79,19 +77,9 @@ const MobileCategory = () => {
     initialize();
   }, [initialize]);
 
-  // Get category from store or fallback
+  // Get category from store
   const category = useMemo(() => {
-    const cat = getCategoryById(categoryId);
-    return (
-      cat ||
-      fallbackCategories.find((fallbackCat) => {
-        const fallbackId = normalizeId(fallbackCat.id);
-        return (
-          fallbackId === categoryId ||
-          fallbackCat.name?.toLowerCase() === categoryId.toLowerCase()
-        );
-      })
-    );
+    return getCategoryById(categoryId) || null;
   }, [categoryId, categories, getCategoryById]);
 
   const [showFilters, setShowFilters] = useState(false);
@@ -133,15 +121,7 @@ const MobileCategory = () => {
         );
       } catch {
         if (cancelled) return;
-        const fallback = getCatalogProducts().filter((product) => {
-          const productCategoryId = normalizeId(product.categoryId);
-          const productCategory = categories.find(
-            (cat) => normalizeId(cat.id) === productCategoryId
-          );
-          const productParentId = getParentId(productCategory);
-          return productCategoryId === categoryId || productParentId === categoryId;
-        });
-        setCategoryProductsFeed(fallback);
+        setCategoryProductsFeed([]);
       }
     };
 
@@ -152,11 +132,9 @@ const MobileCategory = () => {
   }, [categoryId, categories]);
 
   const rootCategories = useMemo(() => {
-    const roots = categories.filter(
+    return categories.filter(
       (cat) => !getParentId(cat) && cat.isActive !== false
     );
-    if (roots.length) return roots;
-    return fallbackCategories;
   }, [categories]);
 
   const categoryProducts = useMemo(() => {

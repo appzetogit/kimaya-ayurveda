@@ -163,7 +163,6 @@ const VendorDashboard = () => {
               <div className={`${stat.color} p-3 rounded-lg`}>
                 <stat.icon className="text-white text-xl" />
               </div>
-              <FiArrowRight className={`${stat.textColor} text-lg`} />
             </div>
             <h3 className={`${stat.textColor} text-sm font-medium mb-1`}>
               {stat.label}

@@ -109,11 +109,6 @@ const ManageVendors = () => {
 
   const columns = [
     {
-      key: "id",
-      label: "ID",
-      sortable: true,
-    },
-    {
       key: "storeName",
       label: "Store Name",
       sortable: true,

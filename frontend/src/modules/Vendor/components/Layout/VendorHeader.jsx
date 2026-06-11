@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiMenu, FiBell, FiLogOut, FiShoppingBag } from "react-icons/fi";
+import { FiMenu, FiBell, FiLogOut, FiShoppingBag, FiArrowLeft } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useVendorAuthStore } from "../../store/vendorAuthStore";
 import { useVendorNotificationStore } from "../../store/vendorNotificationStore";
@@ -55,8 +55,8 @@ const VendorHeader = ({ onMenuClick }) => {
         paddingTop: "env(safe-area-inset-top, 0px)",
       }}>
       <div className="flex items-center justify-between px-4 lg:px-6 py-4">
-        {/* Left: Menu Button */}
-        <div className="flex items-center gap-4">
+        {/* Left: Menu Button & Back Button */}
+        <div className="flex items-center gap-2 lg:gap-4">
           <Button
             onClick={onMenuClick}
             variant="icon"
@@ -64,8 +64,17 @@ const VendorHeader = ({ onMenuClick }) => {
             icon={FiMenu}
           />
 
+          {/* Global Back Button */}
+          <Button
+            onClick={() => navigate(-1)}
+            variant="icon"
+            className="text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-full"
+            icon={FiArrowLeft}
+            title="Go Back"
+          />
+
           {/* Page Heading - Desktop Only */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block ml-2">
             <h1 className="text-2xl font-bold text-gray-800 mb-1">
               {pageName}
             </h1>

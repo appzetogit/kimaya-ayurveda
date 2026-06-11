@@ -14,7 +14,6 @@ import useLongPress from "../../hooks/useLongPress";
 import LongPressMenu from "./LongPressMenu";
 import FlyingItem from "./FlyingItem";
 import VendorBadge from "../../../Vendor/components/VendorBadge";
-import { getVendorById } from "../../data/catalogData";
 import { getVariantSignature } from "../../../../shared/utils/variant";
 
 const MobileProductCard = ({ product }) => {
@@ -212,7 +211,7 @@ const MobileProductCard = ({ product }) => {
             {product.vendorId && (
               <div className="mb-2">
                 <VendorBadge
-                  vendor={getVendorById(product.vendorId)}
+                  vendor={product.vendor || { id: product.vendorId, storeName: product.vendorName || "Store" }}
                   showVerified={true}
                   size="sm"
                   disableLink={true}

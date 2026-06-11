@@ -17,12 +17,6 @@ import { useWishlistStore } from "../../../shared/store/wishlistStore";
 import { useReviewsStore } from "../../../shared/store/reviewsStore";
 import { useOrderStore } from "../../../shared/store/orderStore";
 import { useAuthStore } from "../../../shared/store/authStore";
-import {
-  getProductById,
-  getSimilarProducts,
-  getVendorById,
-  getBrandById,
-} from "../data/catalogData";
 import api from "../../../shared/utils/api";
 import { formatPrice } from "../../../shared/utils/helpers";
 import toast from "react-hot-toast";
@@ -164,8 +158,7 @@ const normalizeProduct = (raw) => {
 const MobileProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const localFallbackProduct = useMemo(() => normalizeProduct(getProductById(id)), [id]);
-  const [product, setProduct] = useState(localFallbackProduct);
+  const [product, setProduct] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -185,13 +178,11 @@ const MobileProductDetail = () => {
   const { user, isAuthenticated } = useAuthStore();
   const vendor = useMemo(() => {
     if (!product) return null;
-    if (product.vendor?.id) return product.vendor;
-    return getVendorById(product.vendorId);
+    return product.vendor || null;
   }, [product]);
   const brand = useMemo(() => {
     if (!product) return null;
-    if (product.brand?.id) return product.brand;
-    return getBrandById(product.brandId);
+    return product.brand || null;
   }, [product]);
 
   const isFavorite = product ? isInWishlist(product.id) : false;
@@ -220,7 +211,7 @@ const MobileProductDetail = () => {
           detailRes.status === "fulfilled"
             ? detailRes.value?.data ?? detailRes.value
             : null;
-        const resolvedProduct = normalizeProduct(detailPayload) || localFallbackProduct;
+        const resolvedProduct = normalizeProduct(detailPayload) || null;
 
         const similarPayload =
           similarRes.status === "fulfilled"
@@ -238,19 +229,11 @@ const MobileProductDetail = () => {
         if (!active) return;
 
         setProduct(resolvedProduct);
-        if (resolvedSimilar.length > 0) {
-          setSimilarProducts(resolvedSimilar);
-        } else if (resolvedProduct?.id) {
-          setSimilarProducts(getSimilarProducts(resolvedProduct.id, 5));
-        } else {
-          setSimilarProducts([]);
-        }
+        setSimilarProducts(resolvedSimilar);
       } catch {
         if (!active) return;
-        setProduct(localFallbackProduct);
-        setSimilarProducts(
-          localFallbackProduct?.id ? getSimilarProducts(localFallbackProduct.id, 5) : []
-        );
+        setProduct(null);
+        setSimilarProducts([]);
       } finally {
         if (active) setIsLoadingProduct(false);
       }
@@ -260,7 +243,7 @@ const MobileProductDetail = () => {
     return () => {
       active = false;
     };
-  }, [id, localFallbackProduct]);
+  }, [id]);
 
   useEffect(() => {
     if (product?.variants?.defaultSelection && typeof product.variants.defaultSelection === "object") {

@@ -95,7 +95,7 @@ const Dashboard = () => {
         customerGrowthRes,
         recentOrdersRes,
       ] = await Promise.allSettled([
-        getDashboardStats(),
+        getDashboardStats(period),
         getRevenueData(apiPeriod),
         getOrderStatusBreakdown(),
         getTopProducts(),
@@ -198,7 +198,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <StatsCards stats={stats} />
+      <StatsCards stats={stats} period={period} />
 
       {/* Main Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

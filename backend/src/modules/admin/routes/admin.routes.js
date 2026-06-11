@@ -13,6 +13,7 @@ import * as reportController from '../controllers/report.controller.js';
 import * as marketingController from '../controllers/marketing.controller.js';
 import * as notificationController from '../controllers/notification.controller.js';
 import * as uploadController from '../controllers/upload.controller.js';
+import * as settingsController from '../../../controllers/settings.controller.js';
 import { authenticate } from '../../../middlewares/authenticate.js';
 import { authorize, enforceAccountStatus } from '../../../middlewares/authorize.js';
 import { authLimiter } from '../../../middlewares/rateLimiter.js';
@@ -189,5 +190,8 @@ router.get('/reports/inventory', ...adminAuth, reportController.getInventoryRepo
 router.get('/notifications', ...adminAuth, notificationController.getAdminNotifications);
 router.put('/notifications/:id/read', ...adminAuth, notificationController.markAsRead);
 router.put('/notifications/read-all', ...adminAuth, notificationController.markAllAsRead);
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+router.put('/settings/:category', ...adminAuth, settingsController.updateSettings);
 
 export default router;

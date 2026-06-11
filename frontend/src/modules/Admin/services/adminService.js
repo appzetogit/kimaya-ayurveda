@@ -16,8 +16,8 @@ export const getAdminProfile = () =>
     api.get('/admin/auth/profile');
 
 // ─── Analytics / Dashboard ────────────────────────────────────────────────────
-export const getDashboardStats = () =>
-    api.get('/admin/analytics/dashboard');
+export const getDashboardStats = (period = 'monthly', params = {}) =>
+    api.get('/admin/analytics/dashboard', { params: { period, ...params } });
 
 export const getRevenueData = (period = 'monthly', params = {}) =>
     api.get('/admin/analytics/revenue', { params: { period, ...params } });

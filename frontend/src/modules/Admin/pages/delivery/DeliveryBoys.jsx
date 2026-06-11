@@ -98,12 +98,6 @@ const DeliveryBoys = () => {
 
   const columns = [
     {
-      key: 'id',
-      label: 'ID',
-      sortable: true,
-      render: (value) => <span className="font-semibold text-gray-800">{value}</span>,
-    },
-    {
       key: 'name',
       label: 'Name',
       sortable: true,

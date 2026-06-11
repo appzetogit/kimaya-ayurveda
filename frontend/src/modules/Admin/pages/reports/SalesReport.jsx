@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { FiCalendar, FiTrendingUp } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../components/DataTable';
@@ -12,6 +13,7 @@ const SalesReport = () => {
   const [orders, setOrders] = useState([]);
   const [summary, setSummary] = useState({ totalSales: 0, totalOrders: 0, averageOrderValue: 0 });
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
 
   const fetchOrders = useCallback(async (range = { start: '', end: '' }) => {
     setLoading(true);
@@ -24,7 +26,6 @@ const SalesReport = () => {
         const response = await adminService.getSalesReport({
           page,
           limit: 200,
-          status: 'delivered',
           startDate: range.start,
           endDate: range.end
         });
@@ -47,8 +48,36 @@ const SalesReport = () => {
   }, []);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const period = searchParams.get('period');
+    let start = '';
+    let end = '';
+    
+    if (period) {
+      const now = new Date();
+      end = now.toISOString().split('T')[0];
+      
+      if (period === 'today') {
+        start = end;
+      } else if (period === 'week') {
+        const d = new Date();
+        d.setDate(d.getDate() - 7);
+        start = d.toISOString().split('T')[0];
+      } else if (period === 'month') {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        start = d.toISOString().split('T')[0];
+      } else if (period === 'year') {
+        const d = new Date();
+        d.setFullYear(d.getFullYear() - 1);
+        start = d.toISOString().split('T')[0];
+      }
+      
+      setDateRange({ start, end });
+      fetchOrders({ start, end });
+    } else {
+      fetchOrders();
+    }
+  }, [searchParams, fetchOrders]);
 
   const handleApplyFilter = () => {
     fetchOrders(dateRange);

@@ -7,12 +7,42 @@ import Product from '../../../models/Product.model.js';
 
 // GET /api/admin/analytics/dashboard
 export const getDashboardStats = asyncHandler(async (req, res) => {
+    const { period } = req.query;
+    
     const activeOrderFilter = { isDeleted: { $ne: true } };
+    const userFilter = { role: 'customer' };
+    const vendorFilter = { status: 'approved' };
+    const productFilter = { isActive: true };
+
+    if (period) {
+        const now = new Date();
+        let startDate;
+        if (period === 'today') {
+            startDate = new Date(now.setHours(0, 0, 0, 0));
+        } else if (period === 'week') {
+            startDate = new Date();
+            startDate.setDate(startDate.getDate() - 7);
+        } else if (period === 'month') {
+            startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 1);
+        } else if (period === 'year') {
+            startDate = new Date();
+            startDate.setFullYear(startDate.getFullYear() - 1);
+        }
+        
+        if (startDate) {
+            activeOrderFilter.createdAt = { $gte: startDate };
+            userFilter.createdAt = { $gte: startDate };
+            vendorFilter.createdAt = { $gte: startDate };
+            productFilter.createdAt = { $gte: startDate };
+        }
+    }
+
     const [totalOrders, totalUsers, totalVendors, totalProducts, revenueAgg, pendingOrders] = await Promise.all([
         Order.countDocuments(activeOrderFilter),
-        User.countDocuments({ role: 'customer' }),
-        Vendor.countDocuments({ status: 'approved' }),
-        Product.countDocuments({ isActive: true }),
+        User.countDocuments(userFilter),
+        Vendor.countDocuments(vendorFilter),
+        Product.countDocuments(productFilter),
         Order.aggregate([{ $match: { ...activeOrderFilter, status: { $ne: 'cancelled' } } }, { $group: { _id: null, total: { $sum: '$total' } } }]),
         Order.countDocuments({ ...activeOrderFilter, status: 'pending' }),
     ]);

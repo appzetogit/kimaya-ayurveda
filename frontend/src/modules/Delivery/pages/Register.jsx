@@ -30,6 +30,11 @@ const DeliveryRegister = () => {
       setFormData((prev) => ({ ...prev, [name]: files?.[0] || null }));
       return;
     }
+    if (name === 'phone') {
+      const onlyNums = value.replace(/[^0-9]/g, '').slice(0, 10);
+      setFormData((prev) => ({ ...prev, [name]: onlyNums }));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -109,7 +114,7 @@ const DeliveryRegister = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
                 <div className="relative">
                   <FiPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1234567890" required className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 text-gray-800" />
+                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="1234567890" maxLength="10" pattern="[0-9]{10}" required className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 text-gray-800" />
                 </div>
               </div>
               <div>

@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiFilter, FiX, FiSearch } from "react-icons/fi";
 import MobileLayout from "../components/Layout/MobileLayout";
-import { categories as fallbackCategories } from "../../../data/categories";
-import { getCatalogProducts } from "../data/catalogData";
 import { useCategoryStore } from "../../../shared/store/categoryStore";
 import PageTransition from "../../../shared/components/PageTransition";
 import LazyImage from "../../../shared/components/LazyImage";
@@ -75,30 +73,9 @@ const MobileCategories = () => {
     initialize();
   }, [initialize]);
 
-  // Get root categories (categories without parent) and merge with fallback.
-  // Backend category image should take priority when present.
+  // Get root categories (categories without parent)
   const rootCategories = useMemo(() => {
-    const roots = getRootCategories().filter((cat) => cat.isActive !== false);
-    if (roots.length === 0) {
-      return fallbackCategories;
-    }
-    // Keep backend values as source of truth.
-    // Use fallback image only when backend category has no image.
-    return roots.map((cat) => {
-      const fallbackCat = fallbackCategories.find(
-        (fc) =>
-          normalizeId(fc.id) === normalizeId(cat.id) ||
-          fc.name?.toLowerCase() === cat.name?.toLowerCase()
-      );
-      if (fallbackCat) {
-        return {
-          ...fallbackCat,
-          ...cat,
-          image: cat.image || fallbackCat.image,
-        };
-      }
-      return cat;
-    });
+    return getRootCategories().filter((cat) => cat.isActive !== false);
   }, [categories, getRootCategories]);
 
   const [selectedCategoryId, setSelectedCategoryId] = useState(
@@ -178,19 +155,7 @@ const MobileCategories = () => {
         );
       } catch {
         if (cancelled) return;
-        const selectedId = normalizeId(selectedCategoryId);
-        const selectedSubId = normalizeId(selectedSubcategory);
-        const fallback = getCatalogProducts().filter((product) => {
-          const productCategoryId = normalizeId(product.categoryId);
-          const productCategory = categories.find(
-            (cat) => normalizeId(cat.id) === productCategoryId
-          );
-          const productParentId = getParentId(productCategory);
-
-          if (selectedSubId) return productCategoryId === selectedSubId;
-          return productCategoryId === selectedId || productParentId === selectedId;
-        });
-        setCategoryProductsFeed(fallback);
+        setCategoryProductsFeed([]);
       }
     };
 

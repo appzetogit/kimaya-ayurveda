@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import toast from "react-hot-toast";
-import logoImage from "../../../data/logos/ChatGPT Image Dec 2, 2025, 03_01_19 PM.png";
+import { appLogo } from "../../data/logos";
+const logoImage = appLogo.src;
+import api from "../utils/api";
 
 const defaultSettings = {
   general: {
-    storeName: "Appzeto E-commerce",
+    storeName: "Kimaya Ayurveda",
     storeLogo: logoImage,
     favicon: logoImage,
     contactEmail: "contact@example.com",
@@ -97,6 +99,7 @@ const defaultSettings = {
   },
   homepage: {
     heroBannerEnabled: true,
+    tagline: "Shop from 50+ Trusted Vendors",
     sections: {
       mostPopular: { enabled: true, order: 1 },
       trending: { enabled: true, order: 2 },
@@ -120,7 +123,7 @@ const defaultSettings = {
     smtpUser: "",
     smtpPassword: "",
     fromEmail: "noreply@example.com",
-    fromName: "Appzeto Store",
+    fromName: "Kimaya Ayurveda",
   },
   notifications: {
     email: {
@@ -136,7 +139,7 @@ const defaultSettings = {
     },
   },
   seo: {
-    metaTitle: "Appzeto E-commerce - Shop Online",
+    metaTitle: "Kimaya Ayurveda - Shop Online",
     metaDescription: "Shop the latest trends and products",
     metaKeywords: "ecommerce, shopping, online store",
     ogImage: logoImage,
@@ -156,16 +159,29 @@ export const useSettingsStore = create(
       isLoading: false,
 
       // Initialize settings
-      initialize: () => {
-        const savedSettings = localStorage.getItem("admin-settings");
-        if (savedSettings) {
-          set({ settings: JSON.parse(savedSettings) });
-        } else {
-          set({ settings: defaultSettings });
-          localStorage.setItem(
-            "admin-settings",
-            JSON.stringify(defaultSettings)
-          );
+      initialize: async () => {
+        try {
+          const res = await api.get('/settings');
+          const dbSettings = res?.data || {};
+
+          const mergedSettings = { ...defaultSettings };
+          for (const key in dbSettings) {
+            if (mergedSettings[key]) {
+              mergedSettings[key] = { ...mergedSettings[key], ...dbSettings[key] };
+            } else {
+              mergedSettings[key] = dbSettings[key];
+            }
+          }
+
+          set({ settings: mergedSettings });
+        } catch (error) {
+          console.error("Failed to fetch settings from DB", error);
+          const savedSettings = localStorage.getItem("admin-settings");
+          if (savedSettings) {
+            set({ settings: JSON.parse(savedSettings) });
+          } else {
+            set({ settings: defaultSettings });
+          }
         }
       },
 
@@ -179,22 +195,24 @@ export const useSettingsStore = create(
       },
 
       // Update settings
-      updateSettings: (category, settingsData) => {
+      updateSettings: async (category, settingsData) => {
         set({ isLoading: true });
         try {
           const currentSettings = get().settings;
+          const newCategoryData = {
+            ...currentSettings[category],
+            ...settingsData,
+          };
+
+          await api.put(`/admin/settings/${category}`, newCategoryData);
+
           const updatedSettings = {
             ...currentSettings,
-            [category]: {
-              ...currentSettings[category],
-              ...settingsData,
-            },
+            [category]: newCategoryData,
           };
+          
           set({ settings: updatedSettings, isLoading: false });
-          localStorage.setItem(
-            "admin-settings",
-            JSON.stringify(updatedSettings)
-          );
+          localStorage.setItem("admin-settings", JSON.stringify(updatedSettings));
           toast.success("Settings updated successfully");
           return updatedSettings;
         } catch (error) {

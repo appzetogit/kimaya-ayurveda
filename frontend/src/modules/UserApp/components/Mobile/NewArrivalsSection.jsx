@@ -2,13 +2,9 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FiTag } from "react-icons/fi";
 import LazyImage from "../../../../shared/components/LazyImage";
-import { getNewArrivals } from "../../data/catalogData";
 
-const NewArrivalsSection = ({ products = null }) => {
-  const fallback = getNewArrivals(6);
-  const newArrivals = Array.isArray(products) && products.length > 0
-    ? products.slice(0, 6)
-    : fallback;
+const NewArrivalsSection = ({ products = [] }) => {
+  const newArrivals = Array.isArray(products) ? products.slice(0, 6) : [];
 
   if (newArrivals.length === 0) {
     return null;

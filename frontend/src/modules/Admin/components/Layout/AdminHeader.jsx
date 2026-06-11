@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiMenu, FiBell, FiLogOut } from 'react-icons/fi';
+import { FiMenu, FiBell, FiLogOut, FiArrowLeft } from 'react-icons/fi';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuthStore } from '../../store/adminStore';
 import { useNotificationStore } from '../../store/notificationStore';
@@ -71,6 +71,17 @@ const AdminHeader = ({ onMenuClick }) => {
             className="lg:hidden text-gray-700"
             icon={FiMenu}
           />
+
+          {/* Back Button */}
+          {location.pathname !== '/admin/dashboard' && (
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center"
+              title="Go Back"
+            >
+              <FiArrowLeft className="text-gray-700 text-lg" />
+            </button>
+          )}
 
           {/* Page Heading - Desktop Only */}
           <div className="hidden lg:block">

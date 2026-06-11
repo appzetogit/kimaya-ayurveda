@@ -45,14 +45,14 @@ const DesktopHeader = () => {
 
     return (
         <header className="hidden md:block sticky top-0 z-[999] bg-white shadow-sm border-b border-gray-100">
-            <div className="container mx-auto px-4 md:px-12 lg:px-24 xl:px-40 h-20 flex items-center justify-between gap-8">
+            <div className="container mx-auto px-4 md:px-12 lg:px-24 xl:px-40 h-20 lg:h-24 flex items-center justify-between gap-8">
                 {/* Logo */}
                 <Link to="/home" className="flex-shrink-0 flex items-center gap-2">
                     {appLogo.src ? (
                         <img
                             src={appLogo.src}
                             alt={appLogo.alt}
-                            className="h-10 w-auto object-contain"
+                            className="h-16 lg:h-20 w-auto object-contain scale-110 origin-left -translate-y-3 mix-blend-multiply"
                         />
                     ) : (
                         <span className="text-2xl font-bold text-primary-600">LOGO</span>

@@ -160,8 +160,8 @@ const Customers = () => {
             <button
               onClick={() => setViewMode('grid')}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${viewMode === 'grid'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600'
+                ? 'bg-white text-primary-600 shadow-sm'
+                : 'text-gray-600'
                 }`}
             >
               Grid
@@ -169,8 +169,8 @@ const Customers = () => {
             <button
               onClick={() => setViewMode('table')}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${viewMode === 'table'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600'
+                ? 'bg-white text-primary-600 shadow-sm'
+                : 'text-gray-600'
                 }`}
             >
               Table

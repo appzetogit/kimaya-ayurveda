@@ -136,7 +136,7 @@ const MobileVerification = () => {
 
               {/* Code Input Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center gap-2 sm:gap-3">
                   {codes.map((code, index) => (
                     <input
                       key={index}
@@ -148,7 +148,7 @@ const MobileVerification = () => {
                       onChange={(e) => handleChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       onPaste={index === 0 ? handlePaste : undefined}
-                      className={`w-14 h-14 rounded-full border-2 text-center text-xl font-semibold focus:outline-none transition-all ${code
+                      className={`w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-14 rounded-full border-2 text-center text-lg sm:text-xl font-semibold focus:outline-none transition-all ${code
                           ? 'border-purple-500 bg-purple-50 text-purple-700'
                           : 'border-gray-200 focus:border-purple-500 text-gray-900'
                         }`}

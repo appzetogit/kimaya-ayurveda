@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { categories as fallbackCategories } from "../../../../data/categories";
 import { FiPackage, FiShoppingBag, FiStar, FiTag, FiZap } from "react-icons/fi";
 import { IoShirtOutline, IoBagHandleOutline } from "react-icons/io5";
 import { LuFootprints } from "react-icons/lu";
@@ -78,23 +77,7 @@ const MobileCategoryIcons = () => {
   }, [initialize]);
 
   const categories = useMemo(() => {
-    const roots = getRootCategories().filter((cat) => cat.isActive !== false);
-    if (!roots.length) return fallbackCategories;
-
-    return roots.map((cat) => {
-      const fallback = fallbackCategories.find(
-        (fc) =>
-          String(fc.id) === String(cat.id) ||
-          String(fc.name || "").toLowerCase() ===
-            String(cat.name || "").toLowerCase()
-      );
-
-      return {
-        ...(fallback || {}),
-        ...cat,
-        id: String(cat.id ?? cat._id ?? fallback?.id ?? ""),
-      };
-    });
+    return getRootCategories().filter((cat) => cat.isActive !== false);
   }, [apiCategories, getRootCategories]);
 
   // Update line position when active category changes or container scrolls

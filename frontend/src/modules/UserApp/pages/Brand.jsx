@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import MobileLayout from "../components/Layout/MobileLayout";
 import ProductCard from "../../../shared/components/ProductCard";
 import ProductListItem from "../components/Mobile/ProductListItem";
-import { getProductsByBrand, getBrandById } from "../data/catalogData";
 import PageTransition from "../../../shared/components/PageTransition";
 import useInfiniteScroll from "../../../shared/hooks/useInfiniteScroll";
 import LazyImage from "../../../shared/components/LazyImage";
@@ -65,8 +64,8 @@ const Brand = () => {
 
     // Get brand information
     const brand = useMemo(
-        () => getBrandById(brandId) || remoteBrand,
-        [brandId, catalogVersion, remoteBrand]
+        () => remoteBrand,
+        [remoteBrand]
     );
 
     const [showFilters, setShowFilters] = useState(false);
@@ -82,19 +81,8 @@ const Brand = () => {
     // Get products for this brand
     const rawBrandProducts = useMemo(() => {
         if (!brandId) return [];
-
-        const local = getProductsByBrand(brandId);
-        if (!remoteProducts.length) return local;
-
-        const merged = [...remoteProducts];
-        local.forEach((item) => {
-            const exists = merged.some(
-                (p) => String(p.id) === String(item.id)
-            );
-            if (!exists) merged.push(item);
-        });
-        return merged;
-    }, [brandId, remoteProducts, catalogVersion]);
+        return remoteProducts;
+    }, [brandId, remoteProducts]);
 
     const brandProducts = useMemo(() => {
         let result = rawBrandProducts;
