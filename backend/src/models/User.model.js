@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
         refreshTokenExpiresAt: { type: Date, select: false },
         passwordResetToken: { type: String, select: false },
         passwordResetExpiry: { type: Date, select: false },
+        // Referral System Fields
+        referralCode: { type: String, unique: true, sparse: true, trim: true },
+        referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+        walletBalance: { type: Number, default: 0 },
     },
     { timestamps: true }
 );

@@ -25,6 +25,7 @@ import Customers from "./modules/Admin/pages/Customers";
 
 import Campaigns from "./modules/Admin/pages/Campaigns";
 import Banners from "./modules/Admin/pages/Banners";
+import ReferralManagement from "./modules/Admin/pages/ReferralManagement";
 import Reviews from "./modules/Admin/pages/Reviews";
 import Analytics from "./modules/Admin/pages/Analytics";
 import Content from "./modules/Admin/pages/Content";
@@ -523,6 +524,7 @@ const AppRoutes = () => {
         <Route path="campaigns" element={<Campaigns />} />
         <Route path="banners" element={<Banners />} />
         <Route path="reviews" element={<Reviews />} />
+        <Route path="referrals" element={<ReferralManagement />} />
         <Route path="content" element={<Content />} />
       </Route>
       {/* Delivery Routes */}

@@ -236,6 +236,18 @@ const MobileProfile = () => {
                       </div>
                       <h2 className="text-xl font-extrabold text-gray-800 mb-1">{user?.name}</h2>
                       <p className="text-gray-500 text-sm mb-4 font-medium">{user?.email}</p>
+
+                      <div className="w-full bg-gray-50 rounded-xl p-4 mb-4 grid grid-cols-2 gap-4 divide-x divide-gray-200 border border-gray-100">
+                        <div className="flex flex-col items-center">
+                          <p className="text-xs text-gray-500 mb-1">Referral Code</p>
+                          <p className="font-bold text-primary-600">{user?.referralCode || 'N/A'}</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <p className="text-xs text-gray-500 mb-1">Wallet Balance</p>
+                          <p className="font-bold text-green-600">₹{user?.walletBalance || 0}</p>
+                        </div>
+                      </div>
+
                       <div className="flex gap-2 w-full">
                         <button
                           onClick={() => setActiveTab('personal')}
@@ -351,6 +363,18 @@ const MobileProfile = () => {
                       <div>
                         <p className="text-gray-600 text-sm mb-1">Profile Picture</p>
                         <p className="text-xs text-gray-500">JPG, PNG or GIF. Max size 5MB</p>
+                      </div>
+                    </div>
+
+                    {/* Referral & Wallet Info */}
+                    <div className="bg-gray-50 rounded-xl p-4 mb-6 flex items-center justify-between border border-gray-100">
+                      <div>
+                        <p className="text-sm text-gray-500">Referral Code</p>
+                        <p className="font-bold text-gray-800 text-lg">{user?.referralCode || 'N/A'}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500">Wallet Balance</p>
+                        <p className="font-bold text-green-600 text-lg">₹{user?.walletBalance || 0}</p>
                       </div>
                     </div>
 

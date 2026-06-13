@@ -4,6 +4,7 @@ import MobileHeader from './MobileHeader';
 import DesktopHeader from './DesktopHeader';
 import MobileBottomNav from './MobileBottomNav';
 import MobileCartBar from './MobileCartBar';
+import Footer from './Footer';
 import CartDrawer from '../../../../shared/components/Cart/CartDrawer';
 import useMobileHeaderHeight from '../../hooks/useMobileHeaderHeight';
 
@@ -46,6 +47,7 @@ const MobileLayout = ({ children, showBottomNav = true, showCartBar = true }) =>
       >
         {children}
       </main>
+      {!isAuthPage && <Footer />}
       {showCartBar && <MobileCartBar />}
       {shouldShowBottomNav && <MobileBottomNav />}
       <CartDrawer />

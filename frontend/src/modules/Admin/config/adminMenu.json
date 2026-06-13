@@ -70,6 +70,11 @@
     ]
   },
   {
+    "title": "Referrals",
+    "route": "/admin/referrals",
+    "children": []
+  },
+  {
     "title": "Offers & Sliders",
     "route": "/admin/offers",
     "children": [

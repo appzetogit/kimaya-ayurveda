@@ -13,6 +13,7 @@ import * as reportController from '../controllers/report.controller.js';
 import * as marketingController from '../controllers/marketing.controller.js';
 import * as notificationController from '../controllers/notification.controller.js';
 import * as uploadController from '../controllers/upload.controller.js';
+import * as referralController from '../controllers/referral.controller.js';
 import * as settingsController from '../../../controllers/settings.controller.js';
 import { authenticate } from '../../../middlewares/authenticate.js';
 import { authorize, enforceAccountStatus } from '../../../middlewares/authorize.js';
@@ -193,5 +194,11 @@ router.put('/notifications/read-all', ...adminAuth, notificationController.markA
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 router.put('/settings/:category', ...adminAuth, settingsController.updateSettings);
+
+// ─── Referrals ─────────────────────────────────────────────────────────────────
+router.get('/referrals', ...adminAuth, referralController.getReferrals);
+router.get('/referrals/transactions', ...adminAuth, referralController.getWalletTransactions);
+router.get('/referrals/settings', ...adminAuth, referralController.getReferralSettings);
+router.put('/referrals/settings', ...adminAuth, referralController.updateReferralSettings);
 
 export default router;

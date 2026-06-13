@@ -60,7 +60,7 @@ export const useAuthStore = create(
       },
 
       // Register action
-      register: async (name, email, password, phone) => {
+      register: async (name, email, password, phone, referralCode) => {
         set({ isLoading: true });
         try {
           const normalizedPhone = String(phone || '').replace(/\D/g, '').slice(-10);
@@ -69,6 +69,7 @@ export const useAuthStore = create(
             email,
             password,
             ...(normalizedPhone ? { phone: normalizedPhone } : {}),
+            ...(referralCode ? { referralCode } : {}),
           };
 
           await api.post('/user/auth/register', payload);

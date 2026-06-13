@@ -171,6 +171,11 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
     await order.save();
 
+    if (nextStatus === 'delivered') {
+        const { processReferralReward } = await import('../../../services/referral.service.js');
+        await processReferralReward(order.userId._id, order._id, order.subtotal || order.total);
+    }
+
     if (nextStatus === 'cancelled') {
         // Reverse vendor earnings visibility for this order.
         // Keep it idempotent by only updating commissions not already cancelled.

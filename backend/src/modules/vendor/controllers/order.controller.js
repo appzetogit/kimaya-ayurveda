@@ -96,6 +96,11 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     order.status = deriveTopLevelOrderStatus(order.vendorItems, order.status);
     await order.save();
 
+    if (order.status === 'delivered') {
+        const { processReferralReward } = await import('../../../services/referral.service.js');
+        await processReferralReward(order.userId, order._id, order.subtotal || order.total);
+    }
+
     const notificationTasks = [];
     if (order.userId) {
         notificationTasks.push(

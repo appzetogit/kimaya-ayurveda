@@ -2,6 +2,7 @@ import asyncHandler from '../../../utils/asyncHandler.js';
 import ApiResponse from '../../../utils/ApiResponse.js';
 import ApiError from '../../../utils/ApiError.js';
 import User from '../../../models/User.model.js';
+import ReferralHistory from '../../../models/ReferralHistory.model.js';
 import { generateTokens } from '../../../utils/generateToken.js';
 import { sendOTP } from '../../../services/otp.service.js';
 import { sendEmail } from '../../../services/email.service.js';
@@ -33,19 +34,43 @@ const extractCloudinaryPublicId = (url = '') => {
 
 // POST /api/user/auth/register
 export const register = asyncHandler(async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, referralCode } = req.body;
     const normalizedEmail = String(email || '').trim().toLowerCase();
     const normalizedPhone = String(phone || '').replace(/\D/g, '').slice(-10);
 
     const existing = await User.findOne({ email: normalizedEmail });
     if (existing) throw new ApiError(409, 'Email already registered.');
 
+    let referrer = null;
+    if (referralCode && referralCode.trim() !== '') {
+        referrer = await User.findOne({ referralCode: referralCode.trim() });
+    }
+
+    let newReferralCode;
+    let isUnique = false;
+    while (!isUnique) {
+        newReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const codeExists = await User.findOne({ referralCode: newReferralCode });
+        if (!codeExists) isUnique = true;
+    }
+
     const user = await User.create({
         name: String(name || '').trim(),
         email: normalizedEmail,
         password,
         ...(normalizedPhone ? { phone: normalizedPhone } : {}),
+        referralCode: newReferralCode,
+        referredBy: referrer ? referrer._id : null
     });
+
+    if (referrer) {
+        await ReferralHistory.create({
+            referrerId: referrer._id,
+            referredUserId: user._id,
+            status: 'pending'
+        });
+    }
+
     await sendOTP(user, 'email_verification');
 
     res.status(201).json(new ApiResponse(201, { email: user.email }, 'Registration successful. Please verify your email.'));

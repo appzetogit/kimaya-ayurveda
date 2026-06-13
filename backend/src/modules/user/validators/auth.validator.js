@@ -5,6 +5,7 @@ export const registerSchema = Joi.object({
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(6).required(),
     phone: Joi.string().pattern(/^[0-9]{10}$/).optional(),
+    referralCode: Joi.string().trim().optional().allow(''),
 });
 
 export const loginSchema = Joi.object({
