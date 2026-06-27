@@ -24,6 +24,8 @@ const userSchema = new mongoose.Schema(
         referralCode: { type: String, unique: true, sparse: true, trim: true },
         referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
         walletBalance: { type: Number, default: 0 },
+        fcmToken: { type: String }, // For Web Notifications
+        fcmtokenMobile: { type: String }, // For Mobile Notifications
     },
     { timestamps: true }
 );

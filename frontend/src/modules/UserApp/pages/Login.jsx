@@ -13,6 +13,7 @@ import {
 } from '../../../shared/utils/postLoginAction';
 import { isValidEmail } from '../../../shared/utils/helpers';
 import toast from 'react-hot-toast';
+import { syncFcmToken } from '../../../utils/fcmSync.js';
 import MobileLayout from '../components/Layout/MobileLayout';
 import PageTransition from '../../../shared/components/PageTransition';
 
@@ -49,6 +50,7 @@ const MobileLogin = () => {
   const onSubmit = async (data) => {
     try {
       await login(data.email, data.password, rememberMe);
+      await syncFcmToken('/user/fcm-token', 'web');
       replayPendingAction();
       toast.success('Login successful!');
       clearPostLoginRedirect();

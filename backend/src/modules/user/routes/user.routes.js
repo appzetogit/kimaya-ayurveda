@@ -5,6 +5,7 @@ import * as wishlistController from '../controllers/wishlist.controller.js';
 import * as reviewController from '../controllers/review.controller.js';
 import * as orderController from '../controllers/order.controller.js';
 import * as notificationController from '../controllers/notification.controller.js';
+import { saveFcmToken } from '../../../controllers/fcm.controller.js';
 import { authenticate } from '../../../middlewares/authenticate.js';
 import { authorize, enforceAccountStatus } from '../../../middlewares/authorize.js';
 import { authLimiter, otpLimiter } from '../../../middlewares/rateLimiter.js';
@@ -46,6 +47,7 @@ router.get('/auth/profile', ...customerAuth, authController.getProfile);
 router.put('/auth/profile', ...customerAuth, validate(updateProfileSchema), authController.updateProfile);
 router.post('/auth/profile/avatar', ...customerAuth, uploadSingle('avatar'), authController.uploadProfileAvatar);
 router.post('/auth/change-password', ...customerAuth, validate(changePasswordSchema), authController.changePassword);
+router.post('/fcm-token', ...customerAuth, saveFcmToken);
 
 // Address routes (protected)
 router.get('/addresses', ...customerAuth, addressController.getAddresses);

@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-do
 import { FiArrowLeft, FiCheck } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { syncFcmToken } from '../../../utils/fcmSync.js';
 import MobileLayout from "../components/Layout/MobileLayout";
 import PageTransition from '../../../shared/components/PageTransition';
 import { useAuthStore } from '../../../shared/store/authStore';
@@ -73,6 +74,7 @@ const MobileVerification = () => {
 
     try {
       await verifyOTP(email, verificationCode);
+      await syncFcmToken('/user/fcm-token', 'web');
       toast.success('Verification successful!');
       navigate('/home');
     } catch (error) {

@@ -13,6 +13,7 @@ import * as returnController from '../controllers/return.controller.js';
 import * as reviewController from '../controllers/review.controller.js';
 import * as shippingController from '../controllers/shipping.controller.js';
 import * as uploadController from '../controllers/upload.controller.js';
+import { saveFcmToken } from '../../../controllers/fcm.controller.js';
 import { authenticate } from '../../../middlewares/authenticate.js';
 import { authorize, enforceAccountStatus } from '../../../middlewares/authorize.js';
 import { authLimiter } from '../../../middlewares/rateLimiter.js';
@@ -51,6 +52,7 @@ router.post('/auth/logout', validate(logoutSchema), authController.logout);
 router.get('/auth/profile', ...vendorAuth, authController.getProfile);
 router.put('/auth/profile', ...vendorAuth, authController.updateProfile);
 router.put('/auth/bank-details', ...vendorAuth, authController.updateBankDetails);
+router.post('/fcm-token', ...vendorAuth, saveFcmToken);
 
 // Products
 router.get('/products', ...vendorAuth, productController.getVendorProducts);

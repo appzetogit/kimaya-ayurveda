@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
 import * as orderController from '../controllers/order.controller.js';
 import * as notificationController from '../controllers/notification.controller.js';
+import { saveFcmToken } from '../../../controllers/fcm.controller.js';
 import { authenticate } from '../../../middlewares/authenticate.js';
 import { authorize, enforceAccountStatus } from '../../../middlewares/authorize.js';
 import { authLimiter } from '../../../middlewares/rateLimiter.js';
@@ -40,6 +41,7 @@ router.post('/auth/refresh', validate(refreshTokenSchema), authController.refres
 router.post('/auth/logout', validate(logoutSchema), authController.logout);
 router.get('/auth/profile', ...deliveryAuth, authController.getProfile);
 router.put('/auth/profile', ...deliveryAuth, authController.updateProfile);
+router.post('/fcm-token', ...deliveryAuth, saveFcmToken);
 
 // Orders
 router.get('/orders', ...deliveryAuth, orderController.getAssignedOrders);

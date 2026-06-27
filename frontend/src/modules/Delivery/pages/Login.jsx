@@ -4,6 +4,7 @@ import { FiMail, FiLock, FiEye, FiEyeOff, FiTruck } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useDeliveryAuthStore } from '../store/deliveryStore';
 import toast from 'react-hot-toast';
+import { syncFcmToken } from '../../../utils/fcmSync';
 import PageTransition from '../../../shared/components/PageTransition';
 
 const DeliveryLogin = () => {
@@ -44,6 +45,7 @@ const DeliveryLogin = () => {
 
     try {
       await login(formData.email, formData.password, rememberMe);
+      await syncFcmToken('/delivery/fcm-token', 'web');
       toast.success('Login successful!');
       // Redirect is handled by auth effect above to avoid duplicate navigation.
     } catch (error) {

@@ -4,6 +4,7 @@ import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useVendorAuthStore } from "../store/vendorAuthStore";
 import toast from 'react-hot-toast';
+import { syncFcmToken } from '../../../utils/fcmSync';
 
 const VendorLogin = () => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const VendorLogin = () => {
 
     try {
       await login(formData.email, formData.password, rememberMe);
+      await syncFcmToken('/vendor/fcm-token', 'web');
       toast.success('Login successful!');
       const from = location.state?.from?.pathname || '/vendor/dashboard';
       navigate(from, { replace: true });

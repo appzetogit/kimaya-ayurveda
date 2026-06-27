@@ -41,6 +41,8 @@ const deliveryBoySchema = new mongoose.Schema(
         totalDeliveries: { type: Number, default: 0 },
         rating: { type: Number, default: 0 },
         cashCollected: { type: Number, default: 0 },
+        fcmToken: { type: String }, // For Web Notifications
+        fcmtokenMobile: { type: String }, // For Mobile Notifications
     },
     { timestamps: true }
 );

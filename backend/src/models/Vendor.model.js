@@ -59,6 +59,8 @@ const vendorSchema = new mongoose.Schema(
         refreshTokenHash: { type: String, select: false },
         refreshTokenExpiresAt: { type: Date, select: false },
         joinDate: { type: Date, default: Date.now },
+        fcmToken: { type: String }, // For Web Notifications
+        fcmtokenMobile: { type: String }, // For Mobile Notifications
     },
     { timestamps: true }
 );
