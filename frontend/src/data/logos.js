@@ -1,4 +1,4 @@
-import kimayaLogo from "../../dist/assets/kimaya logo-BG0H6Zxt.jpeg";
+import kimayaLogo from "../assets/logo.jpeg";
 
 export const appLogo = {
   src: kimayaLogo,

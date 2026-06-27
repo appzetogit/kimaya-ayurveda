@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 
-import kimayaLogo from "../dist/assets/kimaya logo-BG0H6Zxt.jpeg";
+import kimayaLogo from "./assets/logo.jpeg";
 
 // Dynamically set the favicon
 const updateFavicon = () => {

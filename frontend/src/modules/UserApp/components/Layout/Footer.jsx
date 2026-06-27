@@ -15,9 +15,9 @@ const Footer = () => {
           <div>
             <h3 className="text-2xl font-bold mb-2 text-gray-900">Kimaya Ayurveda</h3>
             <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-              API Corner, YN-2, Thakre Nagar Road,<br />
-              Behind Bharat Petrol Pump,<br />
-              CIDCO, Chhatrapati Sambhajinagar – 431005
+              Patil's API Corner, V9F9+3WM, Maya Nagar,<br />
+              MIDC Industrial Area, Chilkalthana,<br />
+              Chhatrapati Sambhajinagar, Maharashtra 431006
             </p>
           </div>
         </div>
@@ -27,7 +27,7 @@ const Footer = () => {
             <FaWhatsapp className="text-4xl text-green-600" />
             <div>
               <p className="text-sm font-semibold text-gray-600">Dr. Amol Deshmukh (BAMS)</p>
-              <p className="text-2xl font-bold tracking-wider text-gray-900">9503303333</p>
+              <p className="text-2xl font-bold tracking-wider text-gray-900">9356593988</p>
             </div>
         </div>
 
