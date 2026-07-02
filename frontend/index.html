@@ -3,7 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="viewport-meta" />
+    <script>
+      // Detect if running inside a mobile app WebView
+      (function () {
+        var isWebView =
+          /Android/.test(navigator.userAgent) &&
+          !/Chrome\/[.0-9]* Mobile/.test(navigator.userAgent) ||
+          /iPhone|iPad|iPod/.test(navigator.userAgent) &&
+          !window.safari && !navigator.userAgent.includes('CriOS') && !navigator.userAgent.includes('FxiOS') ||
+          window.ReactNativeWebView !== undefined ||
+          navigator.userAgent.includes('wv'); // Android WebView flag
+
+        var viewport = document.getElementById('viewport-meta');
+        if (isWebView) {
+          // App WebView: zoom disable
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        } else {
+          // Web browser: zoom allow
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes');
+        }
+      })();
+    </script>
     <title>Kimaya Ayurveda</title>
   </head>
   <body>
