@@ -243,8 +243,12 @@ export const placeOrder = asyncHandler(async (req, res) => {
         // Always trust server-side product pricing; never trust client-sent item.price.
         const { price: itemPrice, variantKey, hasVariantAxes } = resolveVariantSelection(product, item.variant);
         const variantStockValue = variantKey ? Number(product?.variants?.stockMap?.get?.(variantKey) ?? product?.variants?.stockMap?.[variantKey]) : null;
-        if (hasVariantAxes && variantKey && Number.isFinite(variantStockValue) && variantStockValue < item.quantity) {
-            throw new ApiError(400, `Only ${variantStockValue} units available for selected variant of ${product.name}.`);
+        const useVariantStock = variantKey && Number.isFinite(variantStockValue) && variantStockValue !== null && !isNaN(variantStockValue);
+        
+        if (hasVariantAxes && variantKey && useVariantStock) {
+            if (variantStockValue < item.quantity) {
+                throw new ApiError(400, `Only ${variantStockValue} units available for selected variant of ${product.name}.`);
+            }
         }
         const itemSubtotal = itemPrice * item.quantity;
         subtotal += itemSubtotal;
@@ -262,6 +266,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
             quantity: item.quantity,
             variant: item.variant,
             variantKey: variantKey || undefined,
+            useVariantStock: useVariantStock,
         };
         enrichedItems.push(enriched);
 
@@ -381,14 +386,14 @@ export const placeOrder = asyncHandler(async (req, res) => {
                     _id: item.productId,
                     stock: { $ne: 'out_of_stock' },
                 };
-                if (variantPath) {
+                if (variantPath && item.useVariantStock) {
                     baseFilter[variantPath] = { $gte: Number(item.quantity || 0) };
                 } else {
                     baseFilter.stockQuantity = { $gte: Number(item.quantity || 0) };
                 }
 
                 const updatePayload = { $inc: { stockQuantity: -Number(item.quantity || 0) } };
-                if (variantPath) {
+                if (variantPath && item.useVariantStock) {
                     updatePayload.$inc[variantPath] = -Number(item.quantity || 0);
                 }
 
