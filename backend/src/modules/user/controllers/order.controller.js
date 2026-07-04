@@ -380,10 +380,11 @@ export const placeOrder = asyncHandler(async (req, res) => {
                 const baseFilter = {
                     _id: item.productId,
                     stock: { $ne: 'out_of_stock' },
-                    stockQuantity: { $gte: Number(item.quantity || 0) },
                 };
                 if (variantPath) {
                     baseFilter[variantPath] = { $gte: Number(item.quantity || 0) };
+                } else {
+                    baseFilter.stockQuantity = { $gte: Number(item.quantity || 0) };
                 }
 
                 const updatePayload = { $inc: { stockQuantity: -Number(item.quantity || 0) } };

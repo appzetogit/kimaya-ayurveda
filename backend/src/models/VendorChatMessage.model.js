@@ -13,6 +13,7 @@ const vendorChatMessageSchema = new mongoose.Schema(
             enum: ['vendor', 'customer', 'system'],
             required: true,
         },
+        
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
             default: null,

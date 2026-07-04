@@ -20,16 +20,19 @@ export const brands = [
     name: "Forever 21",
     logo: forever21Logo,
   },
+
   {
     id: 3,
     name: "Puma",
     logo: pumaLogo,
   },
+
   {
     id: 4,
     name: "Levi's",
     logo: levisLogo,
   },
+
   {
     id: 5,
     name: "Tommy Hilfiger",
@@ -50,11 +53,13 @@ export const brands = [
     name: "Manyavar",
     logo: manyavarLogo,
   },
+
   {
     id: 9,
     name: "Allen Solly",
     logo: allenSollyLogo,
   },
+
   {
     id: 10,
     name: "Pantaloons",

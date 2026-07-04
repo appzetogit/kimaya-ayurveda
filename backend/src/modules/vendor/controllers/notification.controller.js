@@ -93,7 +93,7 @@ export const deleteVendorNotification = asyncHandler(async (req, res) => {
         recipientId: req.user.id,
         recipientType: 'vendor',
     });
-
+    
     if (!deleted) {
         throw new ApiError(404, 'Notification not found.');
     }
