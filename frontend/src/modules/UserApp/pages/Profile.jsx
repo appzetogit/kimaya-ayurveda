@@ -210,24 +210,20 @@ const MobileProfile = () => {
                       <FiLock className="text-lg" />
                       Password
                     </button>
-                    <a
-                      href="/privacy-policy"
-                      target="_blank"
-                      rel="noreferrer"
+                    <Link
+                      to="/privacy-policy"
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left font-medium text-gray-600 hover:bg-gray-50"
                     >
                       <FiShield className="text-lg" />
                       Privacy Policy
-                    </a>
-                    <a
-                      href="/terms-conditions"
-                      target="_blank"
-                      rel="noreferrer"
+                    </Link>
+                    <Link
+                      to="/terms-conditions"
                       className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left font-medium text-gray-600 hover:bg-gray-50"
                     >
                       <FiFileText className="text-lg" />
                       Terms & Conditions
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

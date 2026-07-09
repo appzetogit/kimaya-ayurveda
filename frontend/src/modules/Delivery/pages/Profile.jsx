@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useDeliveryAuthStore } from '../store/deliveryStore';
 import { FiUser, FiMail, FiPhone, FiTruck, FiEdit2, FiSave, FiX, FiLogOut, FiFileText } from 'react-icons/fi';
 import PageTransition from '../../../shared/components/PageTransition';
@@ -320,8 +320,8 @@ const DeliveryProfile = () => {
             Legal
           </h2>
           <div className="flex flex-col gap-3">
-            <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Privacy Policy</a>
-            <a href="/terms-conditions" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Terms and Conditions</a>
+            <Link to="/privacy-policy" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Privacy Policy</Link>
+            <Link to="/terms-conditions" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Terms and Conditions</Link>
           </div>
         </motion.div>
 

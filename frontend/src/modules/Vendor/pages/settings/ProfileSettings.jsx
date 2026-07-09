@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FiSave, FiUser, FiLock, FiShield, FiFileText } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useVendorAuthStore } from "../../store/vendorAuthStore";
 import toast from 'react-hot-toast';
 
@@ -296,8 +297,8 @@ const ProfileSettings = () => {
               <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <h3 className="text-sm font-semibold text-gray-800 mb-4">Legal Documents</h3>
                 <div className="space-y-3 flex flex-col">
-                  <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Privacy Policy</a>
-                  <a href="/terms-conditions" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Terms & Conditions</a>
+                  <Link to="/privacy-policy" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Privacy Policy</Link>
+                  <Link to="/terms-conditions" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Terms & Conditions</Link>
                 </div>
               </div>
             </div>
