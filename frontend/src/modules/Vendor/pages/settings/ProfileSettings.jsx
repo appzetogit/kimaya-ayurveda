@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiSave, FiUser, FiLock, FiShield } from 'react-icons/fi';
+import { FiSave, FiUser, FiLock, FiShield, FiFileText } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useVendorAuthStore } from "../../store/vendorAuthStore";
 import toast from 'react-hot-toast';
@@ -82,6 +82,7 @@ const ProfileSettings = () => {
     { id: 'profile', label: 'Profile Info', icon: FiUser },
     { id: 'password', label: 'Change Password', icon: FiLock },
     { id: 'security', label: 'Security', icon: FiShield },
+    { id: 'legal', label: 'Legal', icon: FiFileText },
   ];
 
   if (!vendor) {
@@ -285,6 +286,19 @@ const ProfileSettings = () => {
                 >
                   Logout
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Legal Section */}
+          {activeSection === 'legal' && (
+            <div className="space-y-6">
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-800 mb-4">Legal Documents</h3>
+                <div className="space-y-3 flex flex-col">
+                  <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Privacy Policy</a>
+                  <a href="/terms-conditions" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Terms & Conditions</a>
+                </div>
               </div>
             </div>
           )}

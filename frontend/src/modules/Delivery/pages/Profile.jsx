@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useDeliveryAuthStore } from '../store/deliveryStore';
-import { FiUser, FiMail, FiPhone, FiTruck, FiEdit2, FiSave, FiX, FiLogOut } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiTruck, FiEdit2, FiSave, FiX, FiLogOut, FiFileText } from 'react-icons/fi';
 import PageTransition from '../../../shared/components/PageTransition';
 import toast from 'react-hot-toast';
 import { formatPrice } from '../../../shared/utils/helpers';
@@ -305,6 +305,23 @@ const DeliveryProfile = () => {
             ) : (
               <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-800">{formData.vehicleNumber}</p>
             )}
+          </div>
+        </motion.div>
+
+        {/* Legal Information */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="bg-white rounded-2xl p-4 shadow-sm space-y-4"
+        >
+          <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <FiFileText />
+            Legal
+          </h2>
+          <div className="flex flex-col gap-3">
+            <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Privacy Policy</a>
+            <a href="/terms-conditions" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 font-medium text-sm">Terms and Conditions</a>
           </div>
         </motion.div>
 

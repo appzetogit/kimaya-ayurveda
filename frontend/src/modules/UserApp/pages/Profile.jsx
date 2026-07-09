@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiSave, FiCamera, FiArrowLeft, FiPackage, FiMapPin, FiLogOut, FiChevronRight, FiBell } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiSave, FiCamera, FiArrowLeft, FiPackage, FiMapPin, FiLogOut, FiChevronRight, FiBell, FiShield, FiFileText } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -147,6 +147,8 @@ const MobileProfile = () => {
       badge: unreadNotificationCount > 0 ? unreadNotificationCount : null,
     },
     { id: 'password', label: 'Change Password', icon: FiLock, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { id: 'privacy', label: 'Privacy Policy', icon: FiShield, color: 'text-teal-600', bg: 'bg-teal-50', link: '/privacy-policy' },
+    { id: 'terms', label: 'Terms & Conditions', icon: FiFileText, color: 'text-gray-600', bg: 'bg-gray-50', link: '/terms-conditions' },
   ];
 
   return (
@@ -208,6 +210,24 @@ const MobileProfile = () => {
                       <FiLock className="text-lg" />
                       Password
                     </button>
+                    <a
+                      href="/privacy-policy"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left font-medium text-gray-600 hover:bg-gray-50"
+                    >
+                      <FiShield className="text-lg" />
+                      Privacy Policy
+                    </a>
+                    <a
+                      href="/terms-conditions"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left font-medium text-gray-600 hover:bg-gray-50"
+                    >
+                      <FiFileText className="text-lg" />
+                      Terms & Conditions
+                    </a>
                   </div>
                 </div>
               </div>
