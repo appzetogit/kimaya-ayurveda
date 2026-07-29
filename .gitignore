@@ -5,3 +5,5 @@ temp_interactive_push.bat
 
 frontend/.env
 backend/.env
+config.bat
+node_modules
