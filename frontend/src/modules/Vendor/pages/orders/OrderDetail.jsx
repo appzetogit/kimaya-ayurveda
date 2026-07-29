@@ -9,7 +9,15 @@ import {
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useVendorAuthStore } from '../../store/vendorAuthStore';
-import { getVendorOrderById, updateVendorOrderStatus } from '../../services/vendorService';
+import { 
+    getVendorOrderById, 
+    updateVendorOrderStatus,
+    createShiprocketOrder,
+    assignShiprocketAWB,
+    generateShiprocketLabel,
+    requestShiprocketPickup,
+    trackShiprocketAWB
+} from '../../services/vendorService';
 import { formatPrice } from '../../../../shared/utils/helpers';
 import Badge from '../../../../shared/components/Badge';
 import AnimatedSelect from '../../../Admin/components/AnimatedSelect';
@@ -23,6 +31,7 @@ const OrderDetail = () => {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updatingStatus, setUpdatingStatus] = useState(false);
+    const [shippingActionLoading, setShippingActionLoading] = useState(false);
 
     const vendorId = vendor?.id;
     const shippingAddress = order?.shippingAddress ?? order?.address ?? null;
@@ -77,6 +86,21 @@ const OrderDetail = () => {
             // api.js shows toast
         } finally {
             setUpdatingStatus(false);
+        }
+    };
+
+    const handleShiprocketAction = async (action, actionName) => {
+        if (!order) return;
+        setShippingActionLoading(true);
+        try {
+            await action(order.orderId ?? order._id);
+            const res = await getVendorOrderById(id);
+            setOrder(res?.data ?? res);
+            toast.success(`Shiprocket: ${actionName} successful!`);
+        } catch (err) {
+            toast.error(err?.response?.data?.message || `Failed to ${actionName}`);
+        } finally {
+            setShippingActionLoading(false);
         }
     };
 
@@ -264,6 +288,72 @@ const OrderDetail = () => {
                                 {currentStatus.toUpperCase()}
                             </Badge>
                         </div>
+                    </div>
+
+                    {/* Shiprocket Actions */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                        <h2 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <FiPackage />
+                            Shiprocket Actions
+                        </h2>
+                        <div className="flex flex-wrap gap-2">
+                            {!vendorItem?.shiprocketOrderId && (
+                                <button 
+                                    onClick={() => handleShiprocketAction(createShiprocketOrder, "Create Order")} 
+                                    disabled={shippingActionLoading}
+                                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    Create Order
+                                </button>
+                            )}
+                            {vendorItem?.shiprocketOrderId && !vendorItem?.awbCode && (
+                                <button 
+                                    onClick={() => handleShiprocketAction(assignShiprocketAWB, "Assign AWB")} 
+                                    disabled={shippingActionLoading}
+                                    className="px-4 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 disabled:opacity-50"
+                                >
+                                    Assign AWB
+                                </button>
+                            )}
+                            {vendorItem?.awbCode && !vendorItem?.shippingLabelUrl && (
+                                <button 
+                                    onClick={() => handleShiprocketAction(generateShiprocketLabel, "Generate Label")} 
+                                    disabled={shippingActionLoading}
+                                    className="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:opacity-50"
+                                >
+                                    Generate Label
+                                </button>
+                            )}
+                            {vendorItem?.shippingLabelUrl && (
+                                <a 
+                                    href={vendorItem.shippingLabelUrl} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
+                                >
+                                    Download Label
+                                </a>
+                            )}
+                            {vendorItem?.awbCode && (
+                                <button 
+                                    onClick={() => handleShiprocketAction(requestShiprocketPickup, "Request Pickup")} 
+                                    disabled={shippingActionLoading}
+                                    className="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+                                >
+                                    Request Pickup
+                                </button>
+                            )}
+                        </div>
+                        {vendorItem?.awbCode && (
+                            <p className="mt-3 text-sm text-gray-600">
+                                <strong>AWB Code:</strong> {vendorItem.awbCode}
+                            </p>
+                        )}
+                        {vendorItem?.shiprocketOrderId && (
+                            <p className="mt-1 text-sm text-gray-600">
+                                <strong>Shiprocket ID:</strong> {vendorItem.shiprocketOrderId}
+                            </p>
+                        )}
                     </div>
                 </div>
 

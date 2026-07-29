@@ -514,3 +514,47 @@ export const uploadVendorImages = (files, folder = 'vendors/products') => {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
 };
+
+// ─── SHIPROCKET ────────────────────────────────────────────────────────────────
+
+/**
+ * Create a Shiprocket order
+ * @param {string} orderId
+ */
+export const createShiprocketOrder = (orderId) =>
+    api.post('/vendor/shiprocket/create-order', { orderId });
+
+/**
+ * Assign AWB to Shiprocket order
+ * @param {string} orderId
+ */
+export const assignShiprocketAWB = (orderId) =>
+    api.post('/vendor/shiprocket/assign-awb', { orderId });
+
+/**
+ * Generate Shipping Label
+ * @param {string} orderId
+ */
+export const generateShiprocketLabel = (orderId) =>
+    api.post('/vendor/shiprocket/generate-label', { orderId });
+
+/**
+ * Request Pickup
+ * @param {string} orderId
+ */
+export const requestShiprocketPickup = (orderId) =>
+    api.post('/vendor/shiprocket/request-pickup', { orderId });
+
+/**
+ * Track AWB
+ * @param {string} awb
+ */
+export const trackShiprocketAWB = (awb) =>
+    api.get(`/vendor/shiprocket/track/${awb}`);
+
+/**
+ * Cancel Shiprocket Order
+ * @param {string} orderId
+ */
+export const cancelShiprocketOrder = (orderId) =>
+    api.post('/vendor/shiprocket/cancel', { orderId });

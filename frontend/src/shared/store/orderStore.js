@@ -115,9 +115,18 @@ export const useOrderStore = create(
           }
 
           set({ isLoading: false, lastError: null });
-          return createdOrder;
+          return { order: createdOrder, razorpayOrderId: data?.razorpayOrderId };
         } catch (error) {
           set({ isLoading: false, lastError: error?.message || 'Failed to place order.' });
+          throw error;
+        }
+      },
+
+      verifyRazorpayPayment: async (paymentData) => {
+        try {
+          const response = await api.post('/user/orders/verify-payment', paymentData);
+          return response?.data ?? response;
+        } catch (error) {
           throw error;
         }
       },
@@ -190,6 +199,16 @@ export const useOrderStore = create(
           return normalized;
         } catch (error) {
           set({ lastError: error?.message || 'Failed to track order.' });
+          return null;
+        }
+      },
+
+      fetchOrderTrackingDetails: async (orderId) => {
+        try {
+          const response = await api.get(`/user/orders/${orderId}/track`);
+          return response?.data ?? response;
+        } catch (error) {
+          console.error('Failed to fetch Shiprocket tracking details', error);
           return null;
         }
       },

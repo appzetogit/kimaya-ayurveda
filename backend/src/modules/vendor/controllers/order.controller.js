@@ -96,6 +96,19 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     order.status = deriveTopLevelOrderStatus(order.vendorItems, order.status);
     await order.save();
 
+    if (status === 'processing') {
+        try {
+            const shiprocketService = (await import('../../../services/shiprocket.service.js')).default;
+            const vendorGroup = order.vendorItems.find(vi => String(vi.vendorId) === String(req.user.id));
+            if (vendorGroup) {
+                const shipmentDetails = await shiprocketService.createShipment(order, vendorGroup);
+                console.log(`Shiprocket shipment created for order ${order.orderId}, vendor ${req.user.id}:`, shipmentDetails);
+            }
+        } catch (error) {
+            console.error(`Failed to create Shiprocket shipment for order ${order.orderId}, vendor ${req.user.id}`);
+        }
+    }
+
     if (order.status === 'delivered') {
         const { processReferralReward } = await import('../../../services/referral.service.js');
         await processReferralReward(order.userId, order._id, order.subtotal || order.total);

@@ -12,6 +12,9 @@ import { generateTrackingNumber } from '../../../utils/generateTrackingNumber.js
 import mongoose from 'mongoose';
 import { createNotification } from '../../../services/notification.service.js';
 import { calculateVendorShippingForGroups } from '../../../services/vendorShipping.service.js';
+import shiprocketService from '../../../services/shiprocket.service.js';
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
 
 const normalizeVariantPart = (value) => String(value || '').trim().toLowerCase();
 const normalizeAxisName = (value) =>
@@ -244,7 +247,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
         const { price: itemPrice, variantKey, hasVariantAxes } = resolveVariantSelection(product, item.variant);
         const variantStockValue = variantKey ? Number(product?.variants?.stockMap?.get?.(variantKey) ?? product?.variants?.stockMap?.[variantKey]) : null;
         const useVariantStock = variantKey && Number.isFinite(variantStockValue) && variantStockValue !== null && !isNaN(variantStockValue);
-        
+
         if (hasVariantAxes && variantKey && useVariantStock) {
             if (variantStockValue < item.quantity) {
                 throw new ApiError(400, `Only ${variantStockValue} units available for selected variant of ${product.name}.`);
@@ -339,6 +342,27 @@ export const placeOrder = asyncHandler(async (req, res) => {
         status: 'pending',
     }));
 
+    // Razorpay Integration: Create razorpay order if payment is 'card' or online
+    let razorpayOrderId = null;
+    if (normalizedPaymentMethod === 'card' || normalizedPaymentMethod === 'upi') {
+        try {
+            const razorpay = new Razorpay({
+                key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+                key_secret: process.env.RAZORPAY_KEY_SECRET || 'secret_placeholder'
+            });
+
+            const rzpOrder = await razorpay.orders.create({
+                amount: Math.round(total * 100), // Amount in paise
+                currency: 'INR',
+                receipt: `rcpt_${Date.now()}`
+            });
+            razorpayOrderId = rzpOrder.id;
+        } catch (error) {
+            console.error('Razorpay Order Creation Failed:', error);
+            throw new ApiError(500, 'Failed to initialize online payment.');
+        }
+    }
+
     // 6-9. Transactional order creation to avoid partial writes.
     let order = null;
     let idempotentReplay = false;
@@ -347,7 +371,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
         await session.withTransaction(async () => {
             if (idempotencyKey) {
                 const existingOrder = await Order.findOne({ idempotencyScope, idempotencyKey })
-                    .select('orderId total trackingNumber')
+                    .select('orderId total trackingNumber razorpayOrderId')
                     .session(session);
                 if (existingOrder) {
                     order = existingOrder;
@@ -363,7 +387,6 @@ export const placeOrder = asyncHandler(async (req, res) => {
                 vendorItems,
                 shippingAddress,
                 paymentMethod: normalizedPaymentMethod,
-                // Keep every new order pending until gateway/webhook confirmation is implemented.
                 paymentStatus: 'pending',
                 subtotal,
                 shipping,
@@ -376,6 +399,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
                 estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // +5 days
                 idempotencyKey: idempotencyKey || undefined,
                 idempotencyScope: idempotencyKey ? idempotencyScope : undefined,
+                razorpayOrderId: razorpayOrderId || undefined
             }], { session });
             order = createdOrder;
 
@@ -483,6 +507,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
                 orderId: order.orderId,
                 total: order.total,
                 trackingNumber: order.trackingNumber,
+                razorpayOrderId: order.razorpayOrderId,
                 ...(idempotentReplay ? { idempotentReplay: true } : {}),
             },
             responseMessage
@@ -755,4 +780,78 @@ export const getUserReturnRequestById = asyncHandler(async (req, res) => {
         .populate('vendorId', 'storeName email');
     if (!request) throw new ApiError(404, 'Return request not found.');
     res.status(200).json(new ApiResponse(200, normalizeReturnRequest(request), 'Return request fetched.'));
+});
+
+// GET /api/user/orders/:id/track
+export const getOrderTracking = asyncHandler(async (req, res) => {
+    // For guest users, they might not have req.user.id. Since TrackOrder page might be public if accessed by orderId + tracking number.
+    // If it requires user login, we match userId.
+    const query = { orderId: req.params.id };
+    if (req.user?.id) {
+        query.userId = req.user.id;
+    }
+    const order = await Order.findOne(query);
+    if (!order) throw new ApiError(404, 'Order not found.');
+
+    const trackingData = [];
+
+    // Order can have multiple vendor items, each might have an awbCode
+    if (Array.isArray(order.vendorItems)) {
+        for (const vendorGroup of order.vendorItems) {
+            if (vendorGroup.awbCode) {
+                try {
+                    const trackingInfo = await shiprocketService.trackAWB(vendorGroup.awbCode);
+                    trackingData.push({
+                        vendorId: vendorGroup.vendorId,
+                        vendorName: vendorGroup.vendorName,
+                        awbCode: vendorGroup.awbCode,
+                        tracking: trackingInfo,
+                    });
+                } catch (err) {
+                    console.error(`Failed to track AWB ${vendorGroup.awbCode}:`, err.message);
+                    trackingData.push({
+                        vendorId: vendorGroup.vendorId,
+                        vendorName: vendorGroup.vendorName,
+                        awbCode: vendorGroup.awbCode,
+                        error: 'Failed to fetch tracking details from courier partner',
+                    });
+                }
+            }
+        }
+    }
+
+    res.status(200).json(new ApiResponse(200, trackingData, 'Tracking data fetched.'));
+});
+
+// POST /api/user/orders/verify-payment
+export const verifyPayment = asyncHandler(async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
+
+    const order = await Order.findOne({ orderId });
+    if (!order) {
+        throw new ApiError(404, 'Order not found.');
+    }
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        throw new ApiError(400, 'Invalid payment details provided.');
+    }
+
+    const secret = process.env.RAZORPAY_KEY_SECRET || 'secret_placeholder';
+    const generated_signature = crypto
+        .createHmac('sha256', secret)
+        .update(razorpay_order_id + "|" + razorpay_payment_id)
+        .digest('hex');
+
+    if (generated_signature === razorpay_signature) {
+        order.paymentStatus = 'paid';
+        order.razorpayPaymentId = razorpay_payment_id;
+        order.razorpaySignature = razorpay_signature;
+        await order.save();
+
+        res.status(200).json(new ApiResponse(200, { orderId: order.orderId }, 'Payment verified successfully.'));
+    } else {
+        order.paymentStatus = 'failed';
+        await order.save();
+        throw new ApiError(400, 'Payment verification failed.');
+    }
 });

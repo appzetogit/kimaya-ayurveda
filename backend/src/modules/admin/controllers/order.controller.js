@@ -7,6 +7,7 @@ import User from '../../../models/User.model.js';
 import Commission from '../../../models/Commission.model.js';
 import Product from '../../../models/Product.model.js';
 import { createNotification } from '../../../services/notification.service.js';
+import shiprocketService from '../../../services/shiprocket.service.js';
 
 // GET /api/admin/orders
 export const getAllOrders = asyncHandler(async (req, res) => {
@@ -170,6 +171,18 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 
     await order.save();
+
+    if (nextStatus === 'processing') {
+        // Create shipments on Shiprocket for each vendor group
+        for (const vendorGroup of order.vendorItems || []) {
+            try {
+                const shipmentDetails = await shiprocketService.createShipment(order, vendorGroup);
+                console.log(`Shiprocket shipment created for order ${order.orderId}, vendor ${vendorGroup.vendorId}:`, shipmentDetails);
+            } catch (error) {
+                console.error(`Failed to create Shiprocket shipment for order ${order.orderId}, vendor ${vendorGroup.vendorId}`);
+            }
+        }
+    }
 
     if (nextStatus === 'delivered') {
         const { processReferralReward } = await import('../../../services/referral.service.js');

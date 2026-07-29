@@ -24,6 +24,9 @@ const vendorItemGroupSchema = new mongoose.Schema({
         enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
         default: 'pending',
     },
+    shiprocketOrderId: { type: String, sparse: true },
+    awbCode: { type: String, sparse: true },
+    shippingLabelUrl: { type: String },
 });
 
 const orderSchema = new mongoose.Schema(
@@ -78,6 +81,9 @@ const orderSchema = new mongoose.Schema(
         settledAt: Date,
         cancelledAt: Date,
         cancellationReason: String,
+        razorpayOrderId: { type: String, sparse: true },
+        razorpayPaymentId: { type: String, sparse: true },
+        razorpaySignature: { type: String, sparse: true },
         isDeleted: { type: Boolean, default: false, index: true },
         deletedAt: Date,
         deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },

@@ -31,7 +31,7 @@ const MobileCheckout = () => {
   const { items, getTotal, clearCart, getItemsByVendor } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
   const { addresses, getDefaultAddress, addAddress, fetchAddresses } = useAddressStore();
-  const { createOrder } = useOrderStore();
+  const { createOrder, verifyRazorpayPayment } = useOrderStore();
 
   // Group items by vendor
   const itemsByVendor = useMemo(
@@ -68,6 +68,19 @@ const MobileCheckout = () => {
       fetchAddresses().catch(() => null);
     }
   }, [isAuthenticated, fetchAddresses]);
+
+  useEffect(() => {
+    // Load Razorpay Script
+    const loadRazorpay = () => {
+      if (document.getElementById("razorpay-script")) return;
+      const script = document.createElement("script");
+      script.id = "razorpay-script";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      document.body.appendChild(script);
+    };
+    loadRazorpay();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -325,7 +338,7 @@ const MobileCheckout = () => {
     } else if (step === 2) {
       setIsPlacingOrder(true);
       try {
-        const order = await createOrder({
+        const { order, razorpayOrderId } = await createOrder({
           userId: isAuthenticated ? user?.id : null,
           items: items,
           shippingAddress: normalizedShipping,
@@ -339,12 +352,71 @@ const MobileCheckout = () => {
           shippingOption,
         });
 
-        clearCart();
-        toast.success("Order placed successfully!");
-        navigate(`/order-confirmation/${order.id}`);
+        if ((formData.paymentMethod === 'card' || formData.paymentMethod === 'upi') && razorpayOrderId) {
+           // Ensure script is loaded
+           if (!window.Razorpay) {
+             await new Promise((resolve) => {
+               const script = document.createElement("script");
+               script.src = "https://checkout.razorpay.com/v1/checkout.js";
+               script.onload = () => resolve(true);
+               script.onerror = () => resolve(false);
+               document.body.appendChild(script);
+             });
+           }
+
+           if (!window.Razorpay) {
+             toast.error("Failed to load Razorpay checkout. Please check your connection or disable adblocker.");
+             setIsPlacingOrder(false);
+             return;
+           }
+
+           const options = {
+             key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_placeholder', // Usually fetched from env or backend
+             amount: Math.round(finalTotal * 100),
+             currency: 'INR',
+             name: 'Appzeto Multi-Vendor',
+             description: 'Order Payment',
+             order_id: razorpayOrderId,
+             handler: async function (response) {
+               try {
+                 await verifyRazorpayPayment({
+                   razorpay_order_id: response.razorpay_order_id,
+                   razorpay_payment_id: response.razorpay_payment_id,
+                   razorpay_signature: response.razorpay_signature,
+                   orderId: order.orderId
+                 });
+                 clearCart();
+                 toast.success("Payment successful! Order placed.");
+                 navigate(`/order-confirmation/${order.id}`);
+               } catch (verifyError) {
+                 toast.error("Payment verification failed. Please contact support.");
+                 navigate(`/order-confirmation/${order.id}`); // Navigate anyway to show order pending/failed
+               }
+             },
+             prefill: {
+               name: normalizedShipping.name,
+               email: normalizedShipping.email,
+               contact: normalizedShipping.phone
+             },
+             theme: {
+               color: '#10B981'
+             }
+           };
+
+           const rzp = new window.Razorpay(options);
+           rzp.on('payment.failed', function (response) {
+               toast.error("Payment failed: " + response.error.description);
+               setIsPlacingOrder(false);
+           });
+           rzp.open();
+        } else {
+           // COD or no Razorpay needed
+           clearCart();
+           toast.success("Order placed successfully!");
+           navigate(`/order-confirmation/${order.id}`);
+        }
       } catch (error) {
         toast.error(error?.message || "Failed to place order");
-      } finally {
         setIsPlacingOrder(false);
       }
     }
@@ -564,7 +636,7 @@ const MobileCheckout = () => {
                       Payment Method
                     </h2>
                     <div className="space-y-3 mb-6">
-                      {["card", "cash", "bank"].map((method) => (
+                      {["card", "cash"].map((method) => (
                         <label
                           key={method}
                           className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.paymentMethod === method
@@ -581,10 +653,8 @@ const MobileCheckout = () => {
                           />
                           <span className="font-semibold text-gray-800 capitalize text-base">
                             {method === "card"
-                              ? "Credit/Debit Card"
-                              : method === "cash"
-                                ? "Cash on Delivery"
-                                : "Bank Transfer"}
+                              ? "Online Payment (Razorpay)"
+                              : "Cash on Delivery (COD)"}
                           </span>
                         </label>
                       ))}

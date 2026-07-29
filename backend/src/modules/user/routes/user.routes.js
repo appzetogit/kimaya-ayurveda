@@ -68,8 +68,10 @@ router.post('/reviews/:id/helpful', reviewController.voteHelpful);
 
 // Order routes
 router.post('/orders', ...customerAuth, validate(placeOrderSchema), orderController.placeOrder);
+router.post('/orders/verify-payment', orderController.verifyPayment);
 router.get('/orders', ...customerAuth, orderController.getUserOrders);
 router.get('/orders/:id', ...customerAuth, orderController.getOrderDetail);
+router.get('/orders/:id/track', orderController.getOrderTracking);
 router.patch('/orders/:id/cancel', ...customerAuth, orderController.cancelOrder);
 router.post('/orders/:id/returns', ...customerAuth, validate(createReturnRequestSchema), orderController.createReturnRequest);
 router.get('/returns', ...customerAuth, orderController.getUserReturnRequests);

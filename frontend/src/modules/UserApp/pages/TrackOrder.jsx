@@ -13,9 +13,10 @@ import { useAuthStore } from '../../../shared/store/authStore';
 const MobileTrackOrder = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { getOrder, fetchOrderById, fetchPublicTrackingOrder, lastError } = useOrderStore();
+  const { getOrder, fetchOrderById, fetchPublicTrackingOrder, fetchOrderTrackingDetails, lastError } = useOrderStore();
   const { user } = useAuthStore();
   const [isResolving, setIsResolving] = useState(true);
+  const [liveTracking, setLiveTracking] = useState(null);
   const order = getOrder(orderId);
   const shippingAddress = order?.shippingAddress || {};
   const orderItems = Array.isArray(order?.items) ? order.items : [];
@@ -32,12 +33,22 @@ const MobileTrackOrder = () => {
   useEffect(() => {
     let mounted = true;
     (async () => {
+      let resolvedOrder = order;
       if (!order && orderId) {
-        const privateOrder = await fetchOrderById(orderId);
-        if (!privateOrder) {
-          await fetchPublicTrackingOrder(orderId);
+        resolvedOrder = await fetchOrderById(orderId);
+        if (!resolvedOrder) {
+          resolvedOrder = await fetchPublicTrackingOrder(orderId);
         }
       }
+      
+      // Fetch live tracking details from Shiprocket
+      if (resolvedOrder) {
+        const trackingData = await fetchOrderTrackingDetails(resolvedOrder.id || resolvedOrder.orderId);
+        if (mounted && trackingData && Array.isArray(trackingData)) {
+            setLiveTracking(trackingData);
+        }
+      }
+
       if (mounted) setIsResolving(false);
     })();
     return () => {
@@ -192,6 +203,49 @@ const MobileTrackOrder = () => {
                   })}
                 </div>
               </div>
+
+              {/* Live Shiprocket Tracking */}
+              {liveTracking && liveTracking.length > 0 && (
+                <div className="space-y-4">
+                  {liveTracking.map((shipment, idx) => (
+                    <div key={idx} className="glass-card rounded-2xl p-4">
+                      <h2 className="text-base font-bold text-gray-800 mb-2">Live Tracking: {shipment.vendorName || "Shipment"}</h2>
+                      {shipment.error ? (
+                        <p className="text-sm text-red-500">{shipment.error}</p>
+                      ) : (
+                        <div>
+                          <p className="text-sm text-gray-600 mb-3">
+                            <span className="font-semibold text-gray-800">AWB Code:</span> {shipment.awbCode}
+                            <br />
+                            <span className="font-semibold text-gray-800">Status:</span> {shipment.tracking?.tracking_data?.track_status === 1 ? 'Delivered' : shipment.tracking?.tracking_data?.track_url ? 'In Transit' : 'Pending'}
+                          </p>
+                          
+                          {shipment.tracking?.tracking_data?.shipment_track_activities && shipment.tracking.tracking_data.shipment_track_activities.length > 0 ? (
+                            <div className="space-y-3 mt-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+                              {shipment.tracking.tracking_data.shipment_track_activities.map((activity, aIdx) => (
+                                <div key={aIdx} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 group-[.is-active]:bg-primary-500 group-[.is-active]:text-white text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                    <FiCheckCircle className="text-lg" />
+                                  </div>
+                                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+                                    <div className="flex items-center justify-between space-x-2 mb-1">
+                                      <div className="font-bold text-slate-800 text-sm">{activity.activity}</div>
+                                      <time className="text-xs font-medium text-primary-500">{formatDate(activity.date)}</time>
+                                    </div>
+                                    <div className="text-slate-600 text-xs">{activity.location}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic">No detailed tracking activities available yet.</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Tracking Number */}
               {order.trackingNumber && (

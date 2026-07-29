@@ -13,6 +13,7 @@ import * as returnController from '../controllers/return.controller.js';
 import * as reviewController from '../controllers/review.controller.js';
 import * as shippingController from '../controllers/shipping.controller.js';
 import * as uploadController from '../controllers/upload.controller.js';
+import * as shiprocketController from '../controllers/shiprocket.controller.js';
 import { saveFcmToken } from '../../../controllers/fcm.controller.js';
 import { authenticate } from '../../../middlewares/authenticate.js';
 import { authorize, enforceAccountStatus } from '../../../middlewares/authorize.js';
@@ -66,6 +67,14 @@ router.patch('/stock/:productId', ...vendorAuth, productController.updateStock);
 router.get('/orders', ...vendorAuth, orderController.getVendorOrders);
 router.get('/orders/:id', ...vendorAuth, orderController.getVendorOrderById);
 router.patch('/orders/:id/status', ...vendorAuth, orderController.updateOrderStatus);
+
+// Shiprocket
+router.post('/shiprocket/create-order', ...vendorAuth, shiprocketController.createShiprocketOrder);
+router.post('/shiprocket/assign-awb', ...vendorAuth, shiprocketController.assignAWB);
+router.post('/shiprocket/generate-label', ...vendorAuth, shiprocketController.generateLabel);
+router.post('/shiprocket/request-pickup', ...vendorAuth, shiprocketController.requestPickup);
+router.get('/shiprocket/track/:awb', ...vendorAuth, shiprocketController.trackAWB);
+router.post('/shiprocket/cancel', ...vendorAuth, shiprocketController.cancelOrder);
 
 // Customers
 router.get('/customers', ...vendorAuth, customerController.getVendorCustomers);
